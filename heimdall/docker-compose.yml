@@ -6,16 +6,12 @@ services:
     image: duhio/heimdall-https
     container_name: heimdall
     restart: unless-stopped
+    volumes:
+      - ${DATADIR}/heimdall/config:/config
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-    volumes:
-      - ${DATADIR}/heimdall/config:/config
-#    ports:
-#      - 50080:80
-#      - 50443:443
-    environment:
       - VIRTUAL_HOST=start.${DOMAINNAME}
       - LETSENCRYPT_HOST=start.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
