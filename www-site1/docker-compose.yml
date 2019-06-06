@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+
+# NGINX as Webserver for www.eisvogelweg2.de
+  nginx:
+    container_name: nginx-www
+    restart: unless-stopped
+    image: linuxserver/nginx
+    volumes:
+      - ${USERDIR}/docker/nginx/config:/config
+#    ports:
+#      - 1080:80
+#      - 1443:443
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VIRTUAL_HOST=www.${DOMAINNAME}
+      - LETSENCRYPT_HOST=www.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+

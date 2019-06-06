@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+
+# OpenVPN Server
+  openvpn:
+    cap_add:
+     - NET_ADMIN
+    image: kylemanna/openvpn
+    container_name: openvpn
+#    ports:
+#     - "1194:1194/udp"
+    expose:
+      - 1194
+    restart: always
+    volumes:
+     - ${USERDIR}/docker/openvpn/config:/etc/openvpn
+    environment:
+      - VIRTUAL_PORT=1194
+      - VIRTUAL_HOST=vpn.${DOMAINNAME}
+      - LETSENCRYPT_HOST=vpn.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+

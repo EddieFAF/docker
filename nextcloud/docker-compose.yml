@@ -1,0 +1,81 @@
+version: "3.3"
+services:
+
+# Nextcloud, our own cloud
+  nextcloud:
+    container_name: nextcloud
+    restart: always
+    image: nextcloud
+    links:
+      - mariadb
+    volumes:
+      - ${USERDIR}/docker/nextcloud/data:/var/www/html
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VIRTUAL_HOST=nextcloud.${DOMAINNAME}
+      - LETSENCRYPT_HOST=nextcloud.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+
+# Datenbank
+  mariadb:
+    image: tiredofit/mariadb
+    container_name: nc-mariadb
+    hostname: mariadb
+    volumes:
+      - ${USERDIR}/docker/mariadb:/var/lib/mysql
+    ports:
+      - target: 3306
+        published: 3306
+        protocol: tcp
+        mode: host
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=nextcloud
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+# Adminer
+  adminer:
+    image: adminer:standalone
+    container_name: adminer
+    restart: always
+    expose:
+      - 8080
+    environment:
+      - ADMINER_DEFAULT_SERVER=mariadb
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - VIRTUAL_HOST=db-admin.${DOMAINNAME}
+      - VIRTUAL_PORT=8080
+      - LETSENCRYPT_HOST=db-admin.${DOMAINNAME}
+      - LESENCRYPT_EMAIL=eddie.faf@googlemail.com
+    links:
+      - mariadb:db
+
+# Datenbank Admin
+  phpmyadmin:
+    hostname: phpmyadmin
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    links:
+      - mariadb:db
+#    ports:
+#      - 8880:80
+    environment:
+      - PMA_HOST=mariadb
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - VIRTUAL_HOST=pma.${DOMAINNAME}
+      - LETSENCRYPT_HOST=pma.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+

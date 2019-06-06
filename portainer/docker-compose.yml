@@ -1,0 +1,30 @@
+version: "3.3"
+services:
+
+# Portainer
+  portainer:
+    image: "portainer/portainer"
+    container_name: portainer
+    restart: always
+    env_file: /home/eddie/nginx/shared/portainer.env
+    command: -H unix:///var/run/docker.sock
+    expose:
+      - 9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/eddie/docker/portainer/data:/data
+      - /home/eddie/docker/shared:/shared
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - VIRTUAL_HOST=portainer.eisvogelweg2.de
+      - VIRTUAL_PORT=9000
+      - LETSENCRYPT_HOST=portainer.eisvogelweg2.de
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+

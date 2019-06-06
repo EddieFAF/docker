@@ -1,0 +1,65 @@
+version: "3.3"
+services:
+
+  schuetzen-app:
+    image: wordpress:latest
+    container_name: schuetzen-app
+    restart: always
+    links:
+    - schuetzen-db
+    environment:
+      - WORDPRESS_DB_HOST=schuetzen-db
+      - WORDPRESS_DB_NAME=sv
+      - WORDPRESS_DB_USER=sv
+      - WORDPRESS_DB_PASSWORD=terror
+      - ZABBIX_HOSTNAME=schuetzen-app
+      - VIRTUAL_HOST=sv.eisvogelweg2.de
+      - LETSENCRYPT_HOST=sv.eisvogelweg2.de
+      - LETSENCRYPT_EMAIL=eddie.faf@goooglemail.com
+    volumes:
+      - ${USERDIR}/nginx/site3/data:/var/www/html
+      - ${USERDIR}/nginx/site3/logs/:/www/logs
+    expose:
+      - 80
+
+  schuetzen-db:
+    image: tiredofit/mariadb
+    container_name: schuetzen-db
+    restart: always
+    volumes:
+      - ${USERDIR}/nginx/site3/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=sv
+      - MYSQL_DATABASE=sv
+      - MYSQL_PASSWORD=terror
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - ZABBIX_HOSTNAME=schuetzen-db
+
+  schuetzen-db-backup:
+    container_name: schuetzen-db-backup
+    image: tiredofit/mariadb-backup
+    restart: always
+    links:
+     - schuetzen-db
+    volumes:
+      - ${USERDIR}/nginx/site3/dbbackups:/backups
+    environment:
+      - DB_SERVER=schuetzen-db
+      - DB_TYPE=mysql
+      - DB_NAME=sv
+      - DB_USER=sv
+      - DB_PASSWORD=terror
+      - DB_DUMP_FREQ=1440
+      - DB_DUMP_BEGIN=0000
+      - DB_CLEANUP_TIME=8640
+      - COMPRESSION=BZ
+      - SPLIT_DB=FALSE
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+
