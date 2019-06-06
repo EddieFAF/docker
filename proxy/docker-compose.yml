@@ -11,10 +11,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/eddie/nginx/proxy/conf.d:/etc/nginx/conf.d
-      - /home/eddie/nginx/proxy/vhost.d:/etc/nginx/vhost.d
-      - /home/eddie/nginx/proxy/html:/usr/share/nginx/html
-      - /home/eddie/nginx/shared/certs:/etc/nginx/certs:ro
+      - ${DATADIR}/proxy/conf.d:/etc/nginx/conf.d
+      - ${DATADIR}/proxy/vhost.d:/etc/nginx/vhost.d
+      - ${DATADIR}/proxy/html:/usr/share/nginx/html
+      - ${DATADIR}/shared/certs:/etc/nginx/certs:ro
 
   nginx-gen:
     image: jwilder/docker-gen
@@ -22,22 +22,22 @@ services:
     container_name: nginx-gen
     restart: unless-stopped
     volumes:
-      - /home/eddie/nginx/proxy/conf.d:/etc/nginx/conf.d
-      - /home/eddie/nginx/proxy/vhost.d:/etc/nginx/vhost.d
-      - /home/eddie/nginx/proxy/html:/usr/share/nginx/html
-      - /home/eddie/nginx/shared/certs:/etc/nginx/certs:ro
+      - ${DATADIR}/proxy/conf.d:/etc/nginx/conf.d
+      - ${DATADIR}/proxy/vhost.d:/etc/nginx/vhost.d
+      - ${DATADIR}/proxy/html:/usr/share/nginx/html
+      - ${DATADIR}/shared/certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /home/eddie/nginx/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
+      - ${DATADIR}/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     container_name: nginx-letsencrypt
     restart: unless-stopped
     volumes:
-      - /home/eddie/nginx/proxy/conf.d:/etc/nginx/conf.d
-      - /home/eddie/nginx/proxy/vhost.d:/etc/nginx/vhost.d
-      - /home/eddie/nginx/proxy/html:/usr/share/nginx/html
-      - /home/eddie/nginx/shared/certs:/etc/nginx/certs:rw
+      - ${DATADIR}/proxy/conf.d:/etc/nginx/conf.d
+      - ${DATADIR}/proxy/vhost.d:/etc/nginx/vhost.d
+      - ${DATADIR}/proxy/html:/usr/share/nginx/html
+      - ${DATADIR}/shared/certs:/etc/nginx/certs:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       NGINX_DOCKER_GEN_CONTAINER: "nginx-gen"

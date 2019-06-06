@@ -1,0 +1,22 @@
+version: "3"
+services:
+  bitwarden:
+    image: mprasil/bitwarden
+    container_name: bitwarden
+    restart: unless-stopped
+    env_file: /home/eddie/docker/.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATADIR}/bitwarden/data:/data/:rw
+    environment:
+      - VIRTUAL_HOST=bitwarden.eisvogelweg2.de
+      - LETSENCRYPT_HOST=bitwarden.eisvogelweg2.de
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+      - SIGNUPS_ALLOWED=true
+      - ADMIN_TOKEN=faq6wUxI9cD1Z1A14fh3PfLW8wRWCK6rYd0HZ/A2qla4Tn1T2tfZ5ZeFIzGhowpa
+
+networks:
+  default:
+    external: 
+      name: nginx-proxy
+

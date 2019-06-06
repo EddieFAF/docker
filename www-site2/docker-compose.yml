@@ -2,17 +2,14 @@ version: "3.3"
 services:
 
 # NGINX as Webserver for www.honkhausen.de
-  nginx-hh:
-    container_name: nginx-hh
+  www-site2:
+    container_name: www-site2
     restart: unless-stopped
     image: linuxserver/nginx
     volumes:
-      - ${USERDIR}/docker/nginx-hh/config:/config
+      - ${DATADIR}/nginx-hh/config:/config
     expose:
       - 80
-#    ports:
-#      - 1080:80
-#      - 1443:443
     environment:
       - PUID=${PUID}
       - PGID=${PGID}

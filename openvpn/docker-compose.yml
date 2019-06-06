@@ -13,7 +13,7 @@ services:
       - 1194
     restart: always
     volumes:
-     - ${USERDIR}/docker/openvpn/config:/etc/openvpn
+     - ${DATADIR}/openvpn/config:/etc/openvpn
     environment:
       - VIRTUAL_PORT=1194
       - VIRTUAL_HOST=vpn.${DOMAINNAME}

@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+
+# Watchtower for automatic updates
+  watchtower:
+    container_name: watchtower
+    restart: always
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 600 --cleanup
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+  default:
+    driver: bridge
+

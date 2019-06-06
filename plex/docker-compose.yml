@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+
+# Plex Media Server
+  plex:
+    container_name: plex
+    restart: always
+    image: linuxserver/plex
+    domainname: ${DOMAINNAME}
+    network_mode: host
+    ports:
+      - "32400:32400"
+      - "1900:1900/udp"
+      - "3005:3005"
+      - "5353:5353/udp"
+      - "8324:8324"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      - "32469:32469"
+    environment:
+      - VERSION=docker
+      - TZ=${TZ}
+      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
+      - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
+    volumes:
+      - ${DATADIR}/plex/config:/config
+      - /mnt/movies:/data/movies
+      - /mnt/tvshows:/data/tvshows
+      - ${DATADIR}/plex/transcode:/transcode
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+

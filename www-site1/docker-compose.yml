@@ -2,12 +2,12 @@ version: "3.3"
 services:
 
 # NGINX as Webserver for www.eisvogelweg2.de
-  nginx:
-    container_name: nginx-www
+  www-site1:
+    container_name: www-site1
     restart: unless-stopped
     image: linuxserver/nginx
     volumes:
-      - ${USERDIR}/docker/nginx/config:/config
+      - ${DATADIR}/nginx/config:/config
 #    ports:
 #      - 1080:80
 #      - 1443:443

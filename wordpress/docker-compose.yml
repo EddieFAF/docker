@@ -17,8 +17,8 @@ services:
       - LETSENCRYPT_HOST=blog.eisvogelweg2.de
       - LETSENCRYPT_EMAIL=eddie.faf@goooglemail.com
     volumes:
-      - ${USERDIR}/docker/wordpress/data:/var/www/html
-      - ${USERDIR}/docker/wordpress/logs/:/www/logs
+      - ${DATADIR}/wordpress/data:/var/www/html
+      - ${DATADIR}/wordpress/logs/:/www/logs
     expose:
       - 80
 
@@ -27,7 +27,7 @@ services:
     container_name: wordpress-db
     restart: always
     volumes:
-      - ${USERDIR}/docker/wordpress/db:/var/lib/mysql
+      - ${DATADIR}/wordpress/db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=wordpress
@@ -45,7 +45,7 @@ services:
     links:
      - wordpress-db
     volumes:
-      - ${USERDIR}/docker/wordpress/dbbackups:/backups
+      - ${DATADIR}/wordpress/dbbackups:/backups
     environment:
       - DB_SERVER=wordpress-db
       - DB_TYPE=mysql

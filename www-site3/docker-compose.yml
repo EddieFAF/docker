@@ -17,8 +17,8 @@ services:
       - LETSENCRYPT_HOST=sv.eisvogelweg2.de
       - LETSENCRYPT_EMAIL=eddie.faf@goooglemail.com
     volumes:
-      - ${USERDIR}/nginx/site3/data:/var/www/html
-      - ${USERDIR}/nginx/site3/logs/:/www/logs
+      - ${DATADIR}/site3/data:/var/www/html
+      - ${DATADIR}/site3/logs/:/www/logs
     expose:
       - 80
 
@@ -27,7 +27,7 @@ services:
     container_name: schuetzen-db
     restart: always
     volumes:
-      - ${USERDIR}/nginx/site3/db:/var/lib/mysql
+      - ${DATADIR}/site3/db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=sv
@@ -45,7 +45,7 @@ services:
     links:
      - schuetzen-db
     volumes:
-      - ${USERDIR}/nginx/site3/dbbackups:/backups
+      - ${DATADIR}/site3/dbbackups:/backups
     environment:
       - DB_SERVER=schuetzen-db
       - DB_TYPE=mysql
