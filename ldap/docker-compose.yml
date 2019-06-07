@@ -1,0 +1,40 @@
+version: '2'
+
+services:
+  lemonldap-app:
+    image: tiredofit/lemonldap:latest
+    container_name: lemonldap-app
+    volumes:
+    - ${DATADIR}/lemonldap-ng:/etc/lemonldap-ng
+    - ${DATADIR}/lemonldap-ng/conf:/var/lib/lemonldap-ng/conf
+    - ${DATADIR}/lemonldap-ng/sessions:/var/lib/lemonldap-ng/sessions
+    - ${DATADIR}/lemonldap-ng/psessions:/var/lib/lemonldap-ng/psessions
+    - ${DATADIR}/lemonldap-ng/logs:/www/logs
+    - ${DATADIR}/lemonldap/assets/custom:/assets/custom
+    environment:
+    - VIRTUAL_HOST=sso.eisvogelweg2.de,manager.sso.eisvogelweg2.de,handler.sso.eisvogelweg2.de
+    - VIRTUAL_NETWORK=nginx-proxy
+    - VIRTUAL_PORT=80
+    - LETSENCRYPT_HOST=sso.eisvogelweg2.de,manager.sso.eisvogelweg2.de,handler.sso.eisvogelweg2.de
+    - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+
+    - ZABBIX_HOSTNAME=lemonldap-app
+
+    - MANAGER_HOSTNAME=manager.sso.eisvogelweg2.de
+    - PORTAL_HOSTNAME=sso.eisvogelweg2.de
+    - HANDLER_HOSTNAME=handler.sso.eisvogelweg2.de
+    - MANAGER_LANGUAGE=de
+    - DOMAIN_NAME=eisvogelweg2.de 
+    - ENABLE_FAIL2BAN=TRUE
+    networks:
+      - default
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    restart: always
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+
