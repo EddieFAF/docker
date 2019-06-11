@@ -16,6 +16,7 @@ services:
       - ${DATADIR}/proxy/html:/usr/share/nginx/html
       - ${DATADIR}/shared/certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ${DATADIR}/shared/htpasswd:/etc/nginx/htpasswd
       - ${DATADIR}/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
 
   nginx-letsencrypt:
