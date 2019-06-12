@@ -18,6 +18,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${DATADIR}/shared/htpasswd:/etc/nginx/htpasswd
       - ${DATADIR}/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
+      - ${DATADIR}/proxy/dhparam:/etc/nginx/dhparam
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
