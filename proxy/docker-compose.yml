@@ -1,4 +1,4 @@
-version: '3' 
+version: '3.5' 
 services:
 
   nginx:
@@ -19,6 +19,11 @@ services:
       - ${DATADIR}/shared/htpasswd:/etc/nginx/htpasswd
       - ${DATADIR}/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
       - ${DATADIR}/proxy/dhparam:/etc/nginx/dhparam
+    labels:
+      - "com.ouroboros.enable=true"
+    depends_on:
+      - cloudflare-ddns
+      - cloudflare-ddns-2
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
@@ -30,6 +35,8 @@ services:
       - ${DATADIR}/proxy/html:/usr/share/nginx/html
       - ${DATADIR}/shared/certs:/etc/nginx/certs:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "com.ouroboros.enable=true"
 
 # DDNS updates at Cloudflare
   cloudflare-ddns:
@@ -42,6 +49,8 @@ services:
       - API_KEY=5a618dc97b8eea46af82f923e84dfa0dac38d
       - ZONE=eisvogelweg2.de
       - PROXIED=false
+    labels:
+      - "com.ouroboros.enable=true"
 
 # DDNS updates at Cloudflare
   cloudflare-ddns-2:
@@ -54,6 +63,28 @@ services:
       - API_KEY=5a618dc97b8eea46af82f923e84dfa0dac38d
       - ZONE=honkhausen.de
       - PROXIED=false
+    labels:
+      - "com.ouroboros.enable=true"
+
+  auto-updater:
+    image: pyouroboros/ouroboros:latest
+    container_name: ouroboros
+    restart: unless-stopped
+    environment:
+      - CLEANUP=true #delete old images after update
+      - DOCKER_SOCKETS="unix://var/run/docker.sock" #comment this line out on windows
+      - INTERVAL=300
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+      #get auto-update config from labels and only labels.  If a container is not labeled to auto update, don't autoupdate
+      - LABEL_ENABLE=true
+      - LABELS_ONLY=true
+      - TZ=${TZ}
+      - CRON="*/30 * * * *"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock ###Comment this line out in Windows
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:
