@@ -86,6 +86,48 @@ services:
     labels:
       - "com.ouroboros.enable=true"
 
+  docker-gui:
+    image: portainer/portainer:latest
+    ports:
+      #by mapping this port to the host, we are also making this service available even if
+      #traefik is not running at http://localhost:9000 on your host pc or
+      #http://yourhostPCsnetworkname:9000 from other PCs on your network
+      #note that it is an insecure http connection.  Comment out the ports section if
+      #you do not trust the other devices on your network to not spy on you
+      - "9000:9000"
+    expose:
+      - "9000"
+    container_name: portainer-docker-gui
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VIRTUAL_HOST=portainer.${DOMAINNAME}
+      - VIRTUAL_PORT=9000
+      - LETSENCRYPT_HOST=portainer.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - com.ouroboros.enable=true
+    volumes:
+      - ${DATADIR}/portainer/data:/data #map named volume to directory in container
+      #allows portainer to control docker (Linux/Mac only)
+      - /var/run/docker.sock:/var/run/docker.sock ###Comment this line out in Windows
+    #this section allows us to modify arguments passed to the default command executed inside this container (AKA the entrypoint)
+    #when it starts
+###    command: -d /data -H npipe:////./pipe/docker_engine #uncomment this line in windows
+###    command: -d /data -H tcp://localhost:2375 #alternative to the last line, pick only 1!
+    restart: unless-stopped
+    #a healthcheck adds a command that is run inside a container to check that it is working properly, for example, checking
+    #that the server can be reached without errors, as shown below.  Healthchecks also will cause any containers that depend on
+    #this container to wait for indicate that it is in status "healthy" before begining to start themselves, which is useful to
+    #guarantee a database server is up and responding to connections before starting the application server.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://192.168.2.30:9000 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
 networks:
   default:
     external:
