@@ -14,9 +14,9 @@ services:
       - ${DATADIR}/portainer/data:/data
       - ${DATADIR}/shared:/shared
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Berlin
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - VIRTUAL_HOST=portainer.eisvogelweg2.de
       - VIRTUAL_PORT=9000
       - LETSENCRYPT_HOST=portainer.eisvogelweg2.de
