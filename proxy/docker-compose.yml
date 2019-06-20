@@ -46,7 +46,7 @@ services:
     restart: always
     environment:
       - EMAIL=eddie.faf@googlemail.com
-      - API_KEY=5a618dc97b8eea46af82f923e84dfa0dac38d
+      - API_KEY=${API_KEY_1}
       - ZONE=eisvogelweg2.de
       - PROXIED=false
     labels:
@@ -60,7 +60,7 @@ services:
     restart: always
     environment:
       - EMAIL=eddie.faf@googlemail.com
-      - API_KEY=5a618dc97b8eea46af82f923e84dfa0dac38d
+      - API_KEY=${API_KEY_2}
       - ZONE=honkhausen.de
       - PROXIED=false
     labels:

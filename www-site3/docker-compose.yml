@@ -11,10 +11,10 @@ services:
       - WORDPRESS_DB_HOST=schuetzen-db
       - WORDPRESS_DB_NAME=sv
       - WORDPRESS_DB_USER=sv
-      - WORDPRESS_DB_PASSWORD=terror
+      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
       - ZABBIX_HOSTNAME=schuetzen-app
-      - VIRTUAL_HOST=sv.eisvogelweg2.de
-      - LETSENCRYPT_HOST=sv.eisvogelweg2.de
+      - VIRTUAL_HOST=sv.${DOMAINNAME}
+      - LETSENCRYPT_HOST=sv.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@goooglemail.com
     volumes:
       - ${DATADIR}/site3/data:/var/www/html
@@ -32,7 +32,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=sv
       - MYSQL_DATABASE=sv
-      - MYSQL_PASSWORD=terror
+      - MYSQL_PASSWORD=${WORDPRESS_DB_PASSWORD}
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
@@ -51,7 +51,7 @@ services:
       - DB_TYPE=mysql
       - DB_NAME=sv
       - DB_USER=sv
-      - DB_PASSWORD=terror
+      - DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
       - DB_DUMP_FREQ=1440
       - DB_DUMP_BEGIN=0000
       - DB_CLEANUP_TIME=8640
