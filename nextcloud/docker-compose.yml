@@ -3,7 +3,7 @@ services:
 
 # Nextcloud, our own cloud
   nextcloud:
-    container_name: nextcloud
+    container_name: nextcloud-app
     restart: always
     image: nextcloud
     links:
@@ -41,36 +41,36 @@ services:
       - TZ=${TZ}
 
 # Adminer
-  adminer:
-    image: adminer:standalone
-    container_name: adminer
-    restart: always
-    expose:
-      - 8080
-    environment:
-      - ADMINER_DEFAULT_SERVER=nextcloud-db
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - VIRTUAL_HOST=db-admin.${DOMAINNAME}
-      - VIRTUAL_PORT=8080
-      - LETSENCRYPT_HOST=db-admin.${DOMAINNAME}
-      - LESENCRYPT_EMAIL=eddie.faf@googlemail.com
-    links:
-      - nextcloud-db:db
+#  adminer:
+#    image: adminer:standalone
+#    container_name: adminer
+#    restart: always
+#    expose:
+#      - 8080
+#    environment:
+#      - ADMINER_DEFAULT_SERVER=nextcloud-db
+#      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#      - VIRTUAL_HOST=db-admin.${DOMAINNAME}
+#      - VIRTUAL_PORT=8080
+#      - LETSENCRYPT_HOST=db-admin.${DOMAINNAME}
+#      - LESENCRYPT_EMAIL=eddie.faf@googlemail.com
+#    links:
+#      - nextcloud-db:db
 
 # Datenbank Admin
-  phpmyadmin:
-    hostname: phpmyadmin
-    container_name: phpmyadmin
-    image: phpmyadmin/phpmyadmin
-    restart: always
-    links:
-      - nextcloud-db:db
-    environment:
-      - PMA_HOST=nextcloud-db
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - VIRTUAL_HOST=pma.${DOMAINNAME}
-      - LETSENCRYPT_HOST=pma.${DOMAINNAME}
-      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+#  phpmyadmin:
+#    hostname: phpmyadmin
+#    container_name: phpmyadmin
+#    image: phpmyadmin/phpmyadmin
+#    restart: always
+#    links:
+#      - nextcloud-db:db
+#    environment:
+#      - PMA_HOST=nextcloud-db
+#      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#      - VIRTUAL_HOST=pma.${DOMAINNAME}
+#      - LETSENCRYPT_HOST=pma.${DOMAINNAME}
+#      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
 
 networks:
   default:
