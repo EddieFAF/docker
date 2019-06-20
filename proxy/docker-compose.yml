@@ -82,7 +82,7 @@ services:
       - LABELS_ONLY=true
       - TZ=${TZ}
       - CRON="*/30 * * * *"
-      - NOTIFIERS=tgram://777490832:AAGVDsjef3t06aRWDyYSLipsZWVSMn-HEp0/8503256
+      - NOTIFIERS=${TGRAM}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock ###Comment this line out in Windows
     labels:
