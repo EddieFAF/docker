@@ -15,7 +15,7 @@ services:
       - ZABBIX_HOSTNAME=schuetzen-app
       - VIRTUAL_HOST=sv.${DOMAINNAME}
       - LETSENCRYPT_HOST=sv.${DOMAINNAME}
-      - LETSENCRYPT_EMAIL=eddie.faf@goooglemail.com
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
     volumes:
       - ${DATADIR}/site3/data:/var/www/html
       - ${DATADIR}/site3/logs/:/www/logs

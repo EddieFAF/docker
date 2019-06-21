@@ -5,7 +5,6 @@ services:
     image: wordpress:latest
     container_name: wordpress-app
     restart: always
-    env_file: wordpress.env
     links:
     - wordpress-db
     environment:
@@ -16,7 +15,7 @@ services:
       - ZABBIX_HOSTNAME=wordpress-app
       - VIRTUAL_HOST=blog.${DOMAINNAME}
       - LETSENCRYPT_HOST=blog.${DOMAINNAME}
-      - LETSENCRYPT_EMAIL=eddie.faf@goooglemail.com
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
     volumes:
       - ${DATADIR}/wordpress/data:/var/www/html
       - ${DATADIR}/wordpress/logs/:/www/logs

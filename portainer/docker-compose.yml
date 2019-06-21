@@ -17,9 +17,9 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - VIRTUAL_HOST=portainer.eisvogelweg2.de
+      - VIRTUAL_HOST=portainer.${DOMAINNAME}
       - VIRTUAL_PORT=9000
-      - LETSENCRYPT_HOST=portainer.eisvogelweg2.de
+      - LETSENCRYPT_HOST=portainer.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
 
 networks:
