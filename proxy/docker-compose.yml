@@ -84,7 +84,7 @@ services:
     labels:
       - "com.ouroboros.enable=true"
 
-  docker-gui:
+  portainer:
     image: portainer/portainer:latest
     ports:
       #by mapping this port to the host, we are also making this service available even if
@@ -95,7 +95,7 @@ services:
       - "9000:9000"
 #    expose:
 #      - "9000"
-    container_name: portainer-docker-gui
+    container_name: portainer
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
