@@ -35,4 +35,4 @@ services:
 networks:
   proxy-tier:
     external:
-name: nginx-proxy
+      name: nginx-proxy
