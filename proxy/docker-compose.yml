@@ -3,8 +3,6 @@ services:
 
   nginx:
     image: jwilder/nginx-proxy
-    labels:
-      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
     container_name: nginx
     restart: unless-stopped
     ports:
@@ -20,10 +18,8 @@ services:
       - ${DATADIR}/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
       - ${DATADIR}/proxy/dhparam:/etc/nginx/dhparam
     labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
       - "com.ouroboros.enable=true"
-    depends_on:
-      - cloudflare-ddns
-      - cloudflare-ddns-2
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
@@ -104,10 +100,10 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-#      - VIRTUAL_HOST=portainer.${DOMAINNAME}
-#      - VIRTUAL_PORT=9000
-#      - LETSENCRYPT_HOST=portainer.${DOMAINNAME}
-#      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+      - VIRTUAL_HOST=portainer.${DOMAINNAME}
+      - VIRTUAL_PORT=9000
+      - LETSENCRYPT_HOST=portainer.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
     labels:
       - com.ouroboros.enable=true
     volumes:
