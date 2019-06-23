@@ -2,3 +2,4 @@ docker.env
 www-site3/sv.env
 wordpress/wordpress.env
 bitwarden/bitwarden.env
+ldap/.env

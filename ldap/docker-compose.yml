@@ -2,7 +2,7 @@ version: '2'
 
 services:
   lemonldap-app:
-    image: tiredofit/lemonldap:2.0-alpine-latest
+    image: eddiefaf/lemonldap-ng:latest
     container_name: lemonldap-app
     volumes:
     - ${DATADIR}/lemonldap/data/etc/lemonldap-ng:/etc/lemonldap-ng
