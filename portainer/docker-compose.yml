@@ -21,6 +21,8 @@ services:
       - VIRTUAL_PORT=9000
       - LETSENCRYPT_HOST=portainer.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:

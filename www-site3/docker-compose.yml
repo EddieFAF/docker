@@ -19,6 +19,8 @@ services:
     volumes:
       - ${DATADIR}/site3/data:/var/www/html
       - ${DATADIR}/site3/logs/:/www/logs
+    labels:
+      - "com.ouroboros.enable=true"
     expose:
       - 80
 
@@ -37,6 +39,8 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - ZABBIX_HOSTNAME=schuetzen-db
+    labels:
+      - "com.ouroboros.enable=true"
 
   schuetzen-db-backup:
     container_name: schuetzen-db-backup
@@ -57,6 +61,8 @@ services:
       - DB_CLEANUP_TIME=8640
       - COMPRESSION=BZ
       - SPLIT_DB=FALSE
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:

@@ -21,6 +21,8 @@ services:
       - ${DATADIR}/wordpress/logs/:/www/logs
     expose:
       - 80
+    labels:
+      - "com.ouroboros.enable=true"
 
   wordpress-db:
     image: tiredofit/mariadb
@@ -37,6 +39,8 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - ZABBIX_HOSTNAME=wordpress-db
+    labels:
+      - "com.ouroboros.enable=true"
 
   wordpress-db-backup:
     container_name: wordpress-db-backup
@@ -57,6 +61,8 @@ services:
       - DB_CLEANUP_TIME=8640
       - COMPRESSION=BZ
       - SPLIT_DB=FALSE
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:

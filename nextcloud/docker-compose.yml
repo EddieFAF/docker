@@ -17,6 +17,8 @@ services:
       - VIRTUAL_HOST=nextcloud.${DOMAINNAME}
       - LETSENCRYPT_HOST=nextcloud.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - "com.ouroboros.enable=true"
 
 # Datenbank
   nextcloud-db:
@@ -39,6 +41,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - "com.ouroboros.enable=true"
 
 # Adminer
 #  adminer:

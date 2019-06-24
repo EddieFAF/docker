@@ -17,6 +17,8 @@ services:
       - VIRTUAL_HOST=www.honkhausen.de
       - LETSENCRYPT_HOST=www.honkhausen.de
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:

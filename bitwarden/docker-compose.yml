@@ -13,6 +13,8 @@ services:
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
       - SIGNUPS_ALLOWED=true
       - ADMIN_TOKEN=${ADMIN_TOKEN}
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:
