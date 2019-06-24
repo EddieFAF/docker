@@ -18,6 +18,8 @@ services:
       - VIRTUAL_HOST=monitorr.${DOMAINNAME}
       - LETSENCRYPT_HOST=monitorr.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - "com.ouroboros.enable=true"
 
 networks:
   default:

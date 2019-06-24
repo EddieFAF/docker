@@ -18,3 +18,5 @@ services:
       - ${DATADIR}/airsonic/other:/media #optional
     ports:
       - 4040:4040
+    labels:
+      - "com.ouroboros.enable=true"
