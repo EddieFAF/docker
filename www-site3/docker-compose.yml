@@ -21,6 +21,7 @@ services:
       - ${DATADIR}/site3/logs/:/www/logs
     labels:
       - "com.ouroboros.enable=true"
+      - com.ouroboros.hard_depends_on=schuetzen-db,schuetzen-db-backup
     expose:
       - 80
 
@@ -63,6 +64,7 @@ services:
       - SPLIT_DB=FALSE
     labels:
       - "com.ouroboros.enable=true"
+      - com.ouroboros.hard_depends_on=schuetzen-db
 
 networks:
   default:

@@ -19,7 +19,7 @@ services:
       - ${DATADIR}/proxy/dhparam:/etc/nginx/dhparam
     labels:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
-      - "com.ouroboros.enable=true"
+      - "com.ouroboros.enable=false"
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
@@ -32,7 +32,7 @@ services:
       - ${DATADIR}/shared/certs:/etc/nginx/certs:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      - "com.ouroboros.enable=true"
+      - "com.ouroboros.enable=false"
 
 # DDNS updates at Cloudflare
   cloudflare-ddns:
