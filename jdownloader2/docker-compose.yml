@@ -17,8 +17,6 @@ services:
       - TZ=${TZ}
     networks:
       - default
-    labels:
-      - "com.ouroboros.enable=true"
 
 networks:
   default:

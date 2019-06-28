@@ -15,8 +15,6 @@ services:
       - VIRTUAL_HOST=coder.${DOMAINNAME}
       - LETSENCRYPT_HOST=coder.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
-    labels:
-      - "com.ouroboros.enable=true"
 
 networks:
   default:

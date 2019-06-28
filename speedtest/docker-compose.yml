@@ -17,8 +17,6 @@ services:
       - VIRTUAL_HOST=speed.${DOMAINNAME}
       - LETSENCRYPT_HOST=speed.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
-    labels:
-      - "com.ouroboros.enable=true"
 
 networks:
   default:
