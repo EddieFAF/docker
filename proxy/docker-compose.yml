@@ -56,24 +56,24 @@ services:
       - PROXIED=false
 
 # Updater ouroboros
-  auto-updater:
-    image: pyouroboros/ouroboros:latest
-    container_name: ouroboros
-    restart: unless-stopped
-    environment:
-      - CLEANUP=true #delete old images after update
-      - DOCKER_SOCKETS="unix://var/run/docker.sock" #comment this line out on windows
-      - INTERVAL=300
-      - LOG_LEVEL=info
-      - SELF_UPDATE=true
-      #get auto-update config from labels and only labels.  If a container is not labeled to auto update, don't autoupdate
-      - LABEL_ENABLE=true
-      - LABELS_ONLY=true
-      - TZ=${TZ}
-      - CRON="*/30 * * * *"
-      - NOTIFIERS=${TGRAM}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock ###Comment this line out in Windows
+#  auto-updater:
+#    image: pyouroboros/ouroboros:latest
+#    container_name: ouroboros
+#    restart: unless-stopped
+#    environment:
+#      - CLEANUP=true #delete old images after update
+#      - DOCKER_SOCKETS="unix://var/run/docker.sock" #comment this line out on windows
+#      - INTERVAL=300
+#      - LOG_LEVEL=info
+#      - SELF_UPDATE=true
+#      #get auto-update config from labels and only labels.  If a container is not labeled to auto update, don't autoupdate
+#      - LABEL_ENABLE=true
+#      - LABELS_ONLY=true
+#      - TZ=${TZ}
+#      - CRON="*/30 * * * *"
+#      - NOTIFIERS=${TGRAM}
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock ###Comment this line out in Windows
 
   portainer:
     image: portainer/portainer:latest
