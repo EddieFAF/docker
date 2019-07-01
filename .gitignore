@@ -1,12 +1,2 @@
 docker.env
-<<<<<<< HEAD
 .env
-=======
-www-site3/sv.env
-wordpress/wordpress.env
-bitwarden/bitwarden.env
-ldap/.env
-calibre/.env
-mstream/.env
-mayan/.env
->>>>>>> 9f92cbf78bd4447db1464e1287dbc35f53cc12fc
