@@ -7,14 +7,14 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=Europe/Berlin
+      - TZ=${TZ}
     volumes:
-      - ./config:/config
+      - ${DATADIR}/jellyfin/config:/config
       - /mnt/tvshows:/data/tvshows
       - /mnt/movies:/data/movies
       - /mnt/anime/series:/data/tvshows2
       - /mnt/anime/movies:/data/movies2
-      - ./transcoding:/transcode #optional
+      - ${DATADIR}/jellyfin/transcoding:/transcode #optional
     ports:
       - 8096:8096
       - 8920:8920 #optional
