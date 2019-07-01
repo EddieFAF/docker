@@ -5,3 +5,4 @@ bitwarden/bitwarden.env
 ldap/.env
 calibre/.env
 mstream/.env
+mayan/.env
