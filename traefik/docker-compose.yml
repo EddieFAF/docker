@@ -1,0 +1,59 @@
+version: "2"
+
+services:
+  # Reverse Proxy and Let's Encrypt
+  traefik:
+    container_name: traefik
+    image: traefik:alpine
+    restart: always
+    networks:
+      - traefik_proxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./traefik.toml:/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./acme.json:/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.port=8080
+      - traefik.frontend.rule=Host:dash.eisvogelweg2.de
+
+  # Dokuwiki
+  wiki:
+    container_name: dokuwiki
+    image: mprasil/dokuwiki
+    restart: always
+    networks:
+      - traefik_proxy
+    ports:
+      - "8081:80"
+    volumes:
+      - /opt/wiki/data/:/dokuwiki/data
+      - /opt/wiki/conf/:/dokuwiki/conf
+      - /opt/wiki/lib/plugins/:/dokuwiki/lib/plugins
+      - /opt/wiki/lib/tpl/:/dokuwiki/lib/tpl
+      - /opt/wiki/logs/:/dokuwiki/var/log
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:doku.eisvogelweg2.de
+
+# DDNS updates at Cloudflare
+  cloudflare-ddns:
+    container_name: cloudflare-ddns
+    hostname: cloudflare
+    image: oznu/cloudflare-ddns:latest
+    restart: always
+    networks:
+      - traefik_proxy
+    environment:
+      - EMAIL=eddie.faf@googlemail.com
+      - API_KEY=${API_KEY_1}
+      - ZONE=eisvogelweg2.de
+      - PROXIED=false
+
+networks:
+  traefik_proxy:
+    external: true
+
