@@ -1,2 +1,3 @@
 docker.env
 .env
+traefik-proxy/traefik/acme.json
