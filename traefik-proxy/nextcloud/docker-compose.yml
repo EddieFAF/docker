@@ -1,0 +1,103 @@
+version: "3.3"
+services:
+
+# Nextcloud, our own cloud
+  nextcloud:
+    container_name: nextcloud-app
+    restart: always
+    image: nextcloud
+    links:
+      - nextcloud-db
+    volumes:
+      - ${DATADIR}/nextcloud/data:/var/www/html
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    networks:
+      - traefik_proxy
+    labels:
+      - traefik.enable=true
+      - traefik.backend=nextcloud
+      - traefik.frontend.rule=Host:nextcloud.${DOMAINNAME}
+      - traefik.port=80
+      - traefik.docker.network=traefik_proxy
+
+# Datenbank
+  nextcloud-db:
+    image: tiredofit/mariadb
+    container_name: nextcloud-db
+    hostname: nextcloud-db
+    restart: always
+    networks:
+      - traefik_proxy
+    volumes:
+      - ${DATADIR}/nextcloud/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=nextcloud
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+# Adminer
+#  adminer:
+#    image: adminer:standalone
+#    container_name: adminer
+#    restart: always
+#    environment:
+#      - ADMINER_DEFAULT_SERVER=mariadb
+#      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#    labels:
+#      - traefik.backend=adminer
+#      - traefik.frontend.rule=Host:db-admin.${DOMAINNAME}
+#      - traefik.docker.network=traefik_proxy
+#      - traefik.port=8080
+#      - traefik.enable=true
+#    networks:
+#      - traefik_proxy
+#      - default
+#    links:
+#      - mariadb:db
+
+# Datenbank Admin
+#  phpmyadmin:
+#    hostname: phpmyadmin
+#    container_name: phpmyadmin
+#    image: phpmyadmin/phpmyadmin
+#    restart: always
+#    links:
+#      - mariadb:db
+##    ports:
+#      - 8880:80
+#    environment:
+#      - PMA_HOST=mariadb
+#      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#    networks:
+#      - traefik_proxy
+#      - default
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=pma"
+#      - "traefik.frontend.rule=Host:pma.${DOMAINNAME}"
+#      - "traefik.port=80"
+#      - "traefik.docker.network=traefik_proxy" 
+#      - "traefik.frontend.headers.SSLRedirect=true"
+#      - "traefik.frontend.headers.STSSeconds=315360000"
+#      - "traefik.frontend.headers.browserXSSFilter=true"
+#      - "traefik.frontend.headers.contentTypeNosniff=true"
+#      - "traefik.frontend.headers.forceSTSHeader=true"
+#      - "traefik.frontend.headers.SSLHost=eisvogelweg2.de"
+#      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+#      - "traefik.frontend.headers.STSPreload=true"
+#      - "traefik.frontend.headers.frameDeny=true"
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+  default:
+    driver: bridge
+

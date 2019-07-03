@@ -1,0 +1,42 @@
+version: "3.3"
+services:
+
+# NGINX as Webserver for www.honkhausen.de
+  www-site2:
+    container_name: www-site2
+    restart: unless-stopped
+    image: linuxserver/nginx
+    volumes:
+      - ${DATADIR}/nginx-hh/config:/config
+#    ports:
+#      - 1080:80
+#      - 1443:443
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    networks:
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=www-hh"
+      - "traefik.domain=honkhausen.de"
+#      - "traefik.frontend.rule=Host:www.${DOMAINNAME}"
+      - "traefik.frontend.rule=Host:www.honkhausen.de"
+#      - "traefik.docker.network=traefik_proxy"
+#      - "traefik.port=80"
+#      - "traefik.frontend.headers.SSLRedirect=true"
+#      - "traefik.frontend.headers.STSSeconds=315360000"
+#      - "traefik.frontend.headers.browserXSSFilter=true"
+#      - "traefik.frontend.headers.contentTypeNosniff=true"
+#      - "traefik.frontend.headers.forceSTSHeader=true"
+#      - "traefik.frontend.headers.SSLHost=eisvogelweg2.de"
+#      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+#      - "traefik.frontend.headers.STSPreload=true"
+#      - "traefik.frontend.headers.frameDeny=true"
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+ 

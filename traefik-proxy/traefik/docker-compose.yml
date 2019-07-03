@@ -53,6 +53,20 @@ services:
       - ZONE=eisvogelweg2.de
       - PROXIED=false
 
+# DDNS updates at Cloudflare
+  cloudflare-ddns2:
+    container_name: cloudflare-ddns2
+    hostname: cloudflare2
+    image: oznu/cloudflare-ddns:latest
+    restart: always
+    networks:
+      - traefik_proxy
+    environment:
+      - EMAIL=eddie.faf@googlemail.com
+      - API_KEY=${API_KEY_2}
+      - ZONE=honkhausen.de
+      - PROXIED=false
+
 networks:
   traefik_proxy:
     external: true
