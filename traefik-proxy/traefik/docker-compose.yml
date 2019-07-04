@@ -12,9 +12,9 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./traefik.toml:/traefik.toml
+      - ${DATADIR}/traefik/traefik.toml:/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./acme.json:/acme.json
+      - ${DATADIR}/traefik/acme.json:/acme.json
     labels:
       - traefik.enable=true
       - traefik.port=8080
