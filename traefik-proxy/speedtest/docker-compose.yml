@@ -1,0 +1,31 @@
+version: "3.3"
+services:
+
+# Speedtest
+  speedtest:
+    container_name: speedtest
+    restart: unless-stopped
+    image: roest/docker-speedtest-analyser
+    networks:
+      - traefik_proxy
+    volumes:
+      - ${DATADIR}/speedtest/config:/var/www/html/data
+#    ports:
+#      - 51080:80
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VIRTUAL_HOST=speed.${DOMAINNAME}
+      - LETSENCRYPT_HOST=speed.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - traefik.enable=true
+      - traefik.backend=speedtest
+      - traefik.frontend.rule=Host:speed.${DOMAINNAME}
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+

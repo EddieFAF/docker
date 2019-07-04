@@ -1,0 +1,27 @@
+version: "2"
+services:
+  airsonic:
+    image: linuxserver/airsonic
+    container_name: airsonic
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+#      - CONTEXT_PATH=URL_BASE #optional
+#      - JAVA_OPTS=options #optional
+    volumes:
+      - ${DATADIR}/airsonic/config:/config
+      - /mnt/music:/music
+      - ${DATADIR}/airsonic/playlists:/playlists
+      - ${DATADIR}/airsonic/podcasts:/podcasts
+      - ${DATADIR}/airsonic/other:/media #optional
+    networks:
+      - traefik_proxy
+    ports:
+      - 4040:4040
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

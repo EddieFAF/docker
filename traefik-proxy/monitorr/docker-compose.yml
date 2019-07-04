@@ -1,0 +1,29 @@
+version: "3.3"
+services:
+
+# Monitorr
+  monitorr:
+    image: monitorr/monitorr
+    container_name: monitorr
+    restart: on-failure
+#    expose:
+#      - 80
+    networks:
+      - traefik_proxy
+    volumes:
+      - ${DATADIR}/monitorr/app:/app
+      - ${DATADIR}/monitorr/config:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.backend=monitorr
+      - traefik.frontend.rule=Host:monitorr.${DOMAINNAME}
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+
