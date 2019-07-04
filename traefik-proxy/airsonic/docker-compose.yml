@@ -20,6 +20,11 @@ services:
       - traefik_proxy
     ports:
       - 4040:4040
+    labels:
+      - traefik.enable=true
+      - traefik.backend=airsonic
+      - traefik.frontend.rule=Host:airsonic.${DOMAINNAME}
+      - traefik.port=4040
 
 networks:
   traefik_proxy:

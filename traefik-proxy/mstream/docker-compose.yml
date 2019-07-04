@@ -4,8 +4,13 @@ services:
   mstream:
     image: linuxserver/mstream
     container_name: mstream
+    restart: unless-stopped
 #    expose:
 #      - 3000
+    ports:
+      - 53000:3000
+    networks:
+      - traefik_proxy
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -16,12 +21,14 @@ services:
     volumes:
       - ${DATADIR}/mstream/config:/config
       - /mnt/music:/music
-    ports:
-      - 53000:3000
-    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.backend=mstream
+      - traefik.frontend.rule=Host:mstream.${DOMAINNAME}
+      - traefik.port=3000
 
 networks:
-  default:
+  traefik_proxy:
     external:
-      name: nginx-proxy
+      name: traefik_proxy
 
