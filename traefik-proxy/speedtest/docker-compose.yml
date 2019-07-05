@@ -10,8 +10,8 @@ services:
       - traefik_proxy
     volumes:
       - ${DATADIR}/speedtest/config:/var/www/html/data
-#    ports:
-#      - 51080:80
+    ports:
+      - 51080:80
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -23,6 +23,7 @@ services:
       - traefik.enable=true
       - traefik.backend=speedtest
       - traefik.frontend.rule=Host:speed.${DOMAINNAME}
+      - traefik.port=80
 
 networks:
   traefik_proxy:
