@@ -13,8 +13,15 @@ services:
     volumes:
       - ${DATADIR}/calibre/data:/config
       - "/media/t3/ebooks:/config/Calibre-Bibliothek"
+    networks:
+      - traefik_proxy
     ports:
-      - 8080:8080
-      - 8081:8081
+      - 58080:8080
+      - 58081:8081
     restart: unless-stopped
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
 
