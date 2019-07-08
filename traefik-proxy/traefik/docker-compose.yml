@@ -20,24 +20,44 @@ services:
       - traefik.port=8080
       - traefik.frontend.rule=Host:dash.eisvogelweg2.de
 
+#  traefik-forward-auth:
+#    container_name: traefik_forward_auth
+#    image: thomseddon/traefik-forward-auth
+#    networks:
+#      - traefik_proxy
+#    # Uncomment these lines if you're using auth host mode
+#    #deploy:
+#    environment:
+#      - PROVIDERS_GOOGLE_CLIENT_ID=${CLIENT_ID}
+#      - PROVIDERS_GOOGLE_CLIENT_SECRET=${CLIENT_SECRET}
+#      - SECRET=${SECRET}
+#      - INSECURE_COOKIE=true
+#      - DOMAIN=${DOMAINNAME}
+#      - AUTH_HOST=auth.eisvogelweg2.de
+#    labels:
+#      - traefik.enable=true
+#      - traefik.port=4181
+#      - traefik.backend=traefik-forward-auth
+#      - traefik.frontend.rule=Host:auth.eisvogelweg2.de
+
   # Dokuwiki
-  wiki:
-    container_name: dokuwiki
-    image: mprasil/dokuwiki
-    restart: always
-    networks:
-      - traefik_proxy
-    ports:
-      - "8081:80"
-    volumes:
-      - /opt/wiki/data/:/dokuwiki/data
-      - /opt/wiki/conf/:/dokuwiki/conf
-      - /opt/wiki/lib/plugins/:/dokuwiki/lib/plugins
-      - /opt/wiki/lib/tpl/:/dokuwiki/lib/tpl
-      - /opt/wiki/logs/:/dokuwiki/var/log
-    labels:
-      - traefik.enable=true
-      - traefik.frontend.rule=Host:doku.eisvogelweg2.de
+#  wiki:
+#    container_name: dokuwiki
+#    image: mprasil/dokuwiki
+#    restart: always
+#    networks:
+#      - traefik_proxy
+#    ports:
+#      - "8081:80"
+#    volumes:
+#      - /opt/wiki/data/:/dokuwiki/data
+#      - /opt/wiki/conf/:/dokuwiki/conf
+#      - /opt/wiki/lib/plugins/:/dokuwiki/lib/plugins
+#      - /opt/wiki/lib/tpl/:/dokuwiki/lib/tpl
+#      - /opt/wiki/logs/:/dokuwiki/var/log
+#    labels:
+#      - traefik.enable=true
+#      - traefik.frontend.rule=Host:doku.eisvogelweg2.de
 
 # DDNS updates at Cloudflare
   cloudflare-ddns:

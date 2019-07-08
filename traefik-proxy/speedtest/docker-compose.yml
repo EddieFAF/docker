@@ -24,6 +24,9 @@ services:
       - traefik.backend=speedtest
       - traefik.frontend.rule=Host:speed.${DOMAINNAME}
       - traefik.port=80
+#      - traefik.frontend.auth.forward.address=http://traefik-forward-auth:4181
+#      - traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User
+#      - traefik.frontend.auth.forward.trustForwardHeader=true
 
 networks:
   traefik_proxy:
