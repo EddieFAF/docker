@@ -1,5 +1,6 @@
 ---
-version: "2"
+version: "3.3"
+
 services:
   jellyfin:
     image: linuxserver/jellyfin
@@ -25,6 +26,11 @@ services:
       - 8920:8920 #optional
     devices:
       - /dev/dri:/dev/dri #optional
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8096 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
 
 networks:
   traefik_proxy:

@@ -34,6 +34,11 @@ services:
 #      - "traefik.frontend.headers.STSIncludeSubdomains=true"
 #      - "traefik.frontend.headers.STSPreload=true"
 #      - "traefik.frontend.headers.frameDeny=true"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://www.honkhausen.de || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
 
 networks:
   traefik_proxy:
