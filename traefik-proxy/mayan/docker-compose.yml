@@ -16,7 +16,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DATADIR}/mayan-edms/media:/var/lib/mayan
-      - /media/t3//mayan-edms/files/staging:/staging_files
+      - /media/t3/mayan-edms/files/staging:/staging_files
       - /media/t3/mayan-edms/files/watching:/watching_files
     ports:
       - 81:8000
