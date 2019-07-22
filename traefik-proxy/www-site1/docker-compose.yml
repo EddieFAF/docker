@@ -8,8 +8,8 @@ services:
     image: linuxserver/nginx
     volumes:
       - ${DATADIR}/nginx/config:/config
-    ports:
-      - 50080:80
+#    ports:
+#      - 50080:80
     environment:
       - PUID=${PUID}
       - PGID=${PGID}

@@ -19,6 +19,7 @@ services:
       - /mnt/anime/series:/data/tvshows2
       - /mnt/anime/movies:/data/movies2
       - /mnt/music:/data/music
+      - /mnt/unsorted:/data/unsorted
       - ${DATADIR}/jellyfin/transcoding:/transcode #optional
     labels:
       - traefik.enable=false
