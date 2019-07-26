@@ -20,19 +20,19 @@ services:
       - traefik.port=8080
       - traefik.frontend.rule=Host:dash.eisvogelweg2.de
 
-#  traefik-forward-auth:
-#    container_name: traefik_forward_auth
-#    image: thomseddon/traefik-forward-auth
-#    networks:
-#      - traefik_proxy
+  traefik-forward-auth:
+    container_name: traefik_forward_auth
+    image: funkypenguin/traefik-forward-auth
+    networks:
+      - traefik_proxy
 #    # Uncomment these lines if you're using auth host mode
 #    #deploy:
-#    environment:
-#      - PROVIDERS_GOOGLE_CLIENT_ID=${CLIENT_ID}
-#      - PROVIDERS_GOOGLE_CLIENT_SECRET=${CLIENT_SECRET}
-#      - SECRET=${SECRET}
-#      - INSECURE_COOKIE=true
-#      - DOMAIN=${DOMAINNAME}
+    environment:
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - SECRET=${SECRET}
+      - COOKIE_SECURE=true
+      - DOMAIN=${DOMAINNAME}
 #      - AUTH_HOST=auth.eisvogelweg2.de
 #    labels:
 #      - traefik.enable=true
