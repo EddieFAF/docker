@@ -19,6 +19,12 @@ services:
       - LETSENCRYPT_HOST=www.${DOMAINNAME}
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
 
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://www.eisvogelweg2.de || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+
 networks:
   default:
     external:
