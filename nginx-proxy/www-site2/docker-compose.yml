@@ -17,6 +17,11 @@ services:
       - VIRTUAL_HOST=www.honkhausen.de
       - LETSENCRYPT_HOST=www.honkhausen.de
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://www.honkhausen.de || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
 
 networks:
   default:
