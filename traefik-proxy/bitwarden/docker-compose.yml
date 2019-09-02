@@ -10,6 +10,7 @@ services:
     environment:
       - SIGNUPS_ALLOWED=true
       - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - LOG_FILE=${DATADIR}/bitwarden/bitwarden.log
     networks:
       - traefik_proxy
     labels:
