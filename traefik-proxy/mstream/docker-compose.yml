@@ -20,7 +20,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DATADIR}/mstream/config:/config
-      - /mnt/music:/music
+      - /mnt/nasgard/Medien/Music:/music
     labels:
       - traefik.enable=true
       - traefik.backend=mstream

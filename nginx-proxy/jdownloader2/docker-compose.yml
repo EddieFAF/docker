@@ -10,7 +10,7 @@ services:
       - "3129:3129"
     volumes:
       - ${DATADIR}/jdownloader2/config:/config:rw
-      - /home/eddie/Downloads:/output:rw
+      - /mnt/nasgard/download:/output:rw
     environment:
       - USER_ID=${PUID}
       - GROUP_ID=${PGID}

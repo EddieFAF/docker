@@ -12,7 +12,7 @@ services:
 #      - JAVA_OPTS=options #optional
     volumes:
       - ${DATADIR}/airsonic/config:/config
-      - /mnt/music:/music
+      - /mnt/nasgard/Medien/Music:/music
       - ${DATADIR}/airsonic/playlists:/playlists
       - ${DATADIR}/airsonic/podcasts:/podcasts
       - ${DATADIR}/airsonic/other:/media #optional

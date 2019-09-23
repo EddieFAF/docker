@@ -14,11 +14,9 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DATADIR}/jellyfin/config:/config
-      - /mnt/tvshows:/data/tvshows
-      - /mnt/movies:/data/movies
-      - /mnt/anime/series:/data/tvshows2
-      - /mnt/anime/movies:/data/movies2
-      - /mnt/music:/data/music
+      - /mnt/nasgard/Medien/Serien:/data/tvshows
+      - /mnt/nasgard/Medien/Movies:/data/movies
+      - /mnt/nasgard/Medien/Music:/data/music
 #      - /mnt/unsorted:/data/unsorted
       - ${DATADIR}/jellyfin/transcoding:/transcode #optional
     labels:

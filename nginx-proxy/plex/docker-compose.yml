@@ -26,8 +26,8 @@ services:
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
     volumes:
       - ${DATADIR}/plex/config:/config
-      - /mnt/movies:/data/movies
-      - /mnt/tvshows:/data/tvshows
+      - /mnt/nasgard/Medien/Movies:/data/movies
+      - /mnt/nasgard/Medien/Serien:/data/tvshows
       - ${DATADIR}/plex/transcode:/transcode
 
 networks:
