@@ -9,7 +9,7 @@ services:
     expose:
      - 8443
     volumes:
-     - ${USERDIR}/docker-repo/docker:/home/coder/project
+     - ${USERDIR}/repositories/docker:/home/coder/project
     environment:
       - VIRTUAL_PORT=8443
       - VIRTUAL_HOST=coder.${DOMAINNAME}
