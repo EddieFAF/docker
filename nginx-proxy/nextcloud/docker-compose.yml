@@ -1,61 +1,113 @@
-version: "3.3"
+version: "3.2"
+
 services:
 
-# Nextcloud, our own cloud
-  nextcloud:
-    container_name: nextcloud-app
-    restart: always
-    image: nextcloud
-    links:
-      - nextcloud-db
-    volumes:
-      - ${DATADIR}/nextcloud/data:/var/www/html
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - VIRTUAL_HOST=nextcloud.${DOMAINNAME}
-      - LETSENCRYPT_HOST=nextcloud.${DOMAINNAME}
-      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
-
-# Datenbank
-  nextcloud-db:
-    image: tiredofit/mariadb
-    container_name: nextcloud-db
-    hostname: nextcloud-db
+  db:
+    image: mariadb:10.2
+    container_name: nextcloud_db
     volumes:
       - ${DATADIR}/nextcloud/db:/var/lib/mysql
-    ports:
-      - target: 3306
-        published: 3306
-        protocol: tcp
-        mode: host
-    restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=nextcloud
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+    restart: always
 
-# Adminer
-#  adminer:
-#    image: adminer:standalone
-#    container_name: adminer
-#    restart: always
-#    expose:
-#      - 8080
-#    environment:
-#      - ADMINER_DEFAULT_SERVER=nextcloud-db
-#      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-#      - VIRTUAL_HOST=db-admin.${DOMAINNAME}
-#      - VIRTUAL_PORT=8080
-#      - LETSENCRYPT_HOST=db-admin.${DOMAINNAME}
-#      - LESENCRYPT_EMAIL=eddie.faf@googlemail.com
-#    links:
-#      - nextcloud-db:db
+  redis:
+    image: redis:4.0-alpine
+    container_name: nextcloud_redis
+    volumes:
+      - ${DATADIR}/nextcloud/data:/data
+    restart: always
+
+  collabora:
+    image: collabora/code
+    container_name: nextcloud_collabora
+    cap_add:
+      - MKNOD
+    expose: 
+      - 9980
+    environment:
+      - DONT_GEN_SSL_CERT=true
+      - domain=collabora.${DOMAINNAME}
+      - VIRTUAL_HOST=collabora.${DOMAINNAME}
+      - VIRTUAL_PORT=9980
+      - LETSENCRYPT_HOST=collabora.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+      - "extra_params=--disable-ssl"
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
+
+  nextcloud:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ${DATADIR}/nextcloud/data:/data
+    environment:
+      - MEMORY_LIMIT=${MEMORY_LIMIT}
+      - UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE}
+      - OPCACHE_MEM_SIZE=${OPCACHE_MEM_SIZE}
+      - APC_SHM_SIZE=${APC_SHM_SIZE}
+      - REAL_IP_FROM=${REAL_IP_FROM}
+      - REAL_IP_HEADER=${REAL_IP_HEADER}
+      - LOG_IP_VAR=${LOG_IP_VAR}
+      - HSTS_HEADER=${HSTS_HEADER}
+      - RP_HEADER=${RP_HEADER}
+      - VIRTUAL_HOST=nextcloud.${DOMAINNAME}
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=nextcloud.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
+
+  cron:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud_cron
+    depends_on:
+      - nextcloud
+    volumes:
+      - ${DATADIR}/nextcloud/data:/data
+    environment:
+      - "SIDECAR_CRON=1"
+      - "CRON_PERIOD=*/15 * * * *"
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
+
+  news_updater:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud_news_updater
+    depends_on:
+      - nextcloud
+    volumes:
+      - ${DATADIR}/nextcloud/data:/data
+    environment:
+      - "SIDECAR_NEWSUPDATER=1"
+      - "NC_NEWSUPDATER_THREADS=10"
+      - "NC_NEWSUPDATER_TIMEOUT=300"
+      - "NC_NEWSUPDATER_INTERVAL=900"
+      - "NC_NEWSUPDATER_LOGLEVEL=error"
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
 
 # Datenbank Admin
 #  phpmyadmin:
