@@ -44,7 +44,7 @@ services:
     restart: always
 
   nextcloud:
-    image: crazymax/nextcloud:latest
+    image: nextcloud:latest
     container_name: nextcloud
     depends_on:
       - db
@@ -56,11 +56,11 @@ services:
       - UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE}
       - OPCACHE_MEM_SIZE=${OPCACHE_MEM_SIZE}
       - APC_SHM_SIZE=${APC_SHM_SIZE}
-      - REAL_IP_FROM=${REAL_IP_FROM}
-      - REAL_IP_HEADER=${REAL_IP_HEADER}
-      - LOG_IP_VAR=${LOG_IP_VAR}
-      - HSTS_HEADER=${HSTS_HEADER}
-      - RP_HEADER=${RP_HEADER}
+#      - REAL_IP_FROM=${REAL_IP_FROM}
+#      - REAL_IP_HEADER=${REAL_IP_HEADER}
+#      - LOG_IP_VAR=${LOG_IP_VAR}
+#      - HSTS_HEADER=${HSTS_HEADER}
+#      - RP_HEADER=${RP_HEADER}
       - VIRTUAL_HOST=nextcloud.${DOMAINNAME}
       - VIRTUAL_PORT=8000
       - LETSENCRYPT_HOST=nextcloud.${DOMAINNAME}
@@ -72,42 +72,42 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     restart: always
 
-  cron:
-    image: crazymax/nextcloud:latest
-    container_name: nextcloud_cron
-    depends_on:
-      - nextcloud
-    volumes:
-      - ${DATADIR}/nextcloud/data:/data
-    environment:
-      - "SIDECAR_CRON=1"
-      - "CRON_PERIOD=*/15 * * * *"
-      - DB_TYPE=${DB_TYPE}
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    restart: always
+#  cron:
+#    image: crazymax/nextcloud:latest
+#    container_name: nextcloud_cron
+#    depends_on:
+#      - nextcloud
+#    volumes:
+#      - ${DATADIR}/nextcloud/data:/data
+#    environment:
+#      - "SIDECAR_CRON=1"
+#      - "CRON_PERIOD=*/15 * * * *"
+#      - DB_TYPE=${DB_TYPE}
+#      - DB_HOST=${DB_HOST}
+#      - DB_NAME=${DB_NAME}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#    restart: always
 
-  news_updater:
-    image: crazymax/nextcloud:latest
-    container_name: nextcloud_news_updater
-    depends_on:
-      - nextcloud
-    volumes:
-      - ${DATADIR}/nextcloud/data:/data
-    environment:
-      - "SIDECAR_NEWSUPDATER=1"
-      - "NC_NEWSUPDATER_THREADS=10"
-      - "NC_NEWSUPDATER_TIMEOUT=300"
-      - "NC_NEWSUPDATER_INTERVAL=900"
-      - "NC_NEWSUPDATER_LOGLEVEL=error"
-      - DB_TYPE=${DB_TYPE}
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    restart: always
+#  news_updater:
+#    image: crazymax/nextcloud:latest
+#    container_name: nextcloud_news_updater
+#    depends_on:
+#      - nextcloud
+#    volumes:
+#      - ${DATADIR}/nextcloud/data:/data
+#    environment:
+#      - "SIDECAR_NEWSUPDATER=1"
+#      - "NC_NEWSUPDATER_THREADS=10"
+#      - "NC_NEWSUPDATER_TIMEOUT=300"
+#      - "NC_NEWSUPDATER_INTERVAL=900"
+#      - "NC_NEWSUPDATER_LOGLEVEL=error"
+#      - DB_TYPE=${DB_TYPE}
+#      - DB_HOST=${DB_HOST}
+#      - DB_NAME=${DB_NAME}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#    restart: always
 
 # Datenbank Admin
 #  phpmyadmin:

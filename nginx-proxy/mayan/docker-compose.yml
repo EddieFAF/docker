@@ -8,7 +8,7 @@ services:
       - MAYAN_DATABASE_ENGINE=django.db.backends.postgresql
       - MAYAN_DATABASE_HOST=mayan-edms-postgres
       - MAYAN_DATABASE_NAME=mayan
-      - MAYAN_DATABASE_PASSWORD=mayanuserpass
+      - MAYAN_DATABASE_PASSWORD=mayansecret
       - MAYAN_DATABASE_USER=mayan
       - MAYAN_DATABASE_CONN_MAX_AGE=0
       - PUID=${PUID}
@@ -16,8 +16,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DATADIR}/mayan-edms/media:/var/lib/mayan
-      - /media/t3//mayan-edms/files/staging:/staging_files
-      - /media/t3/mayan-edms/files/watching:/watching_files
+      - /mnt/nasgard/incoming/mayan-edms/staging:/staging_files
+      - /mnt/nasgard/incoming/mayan-edms/watching:/watching_files
     ports:
       - 81:8000
     restart: unless-stopped
@@ -29,7 +29,7 @@ services:
     environment:
       - POSTGRES_USER=mayan
       - POSTGRES_DB=mayan
-      - POSTGRES_PASSWORD=mayanuserpass
+      - POSTGRES_PASSWORD=mayansecret
     volumes:
       - /home/eddie/docker-data/mayan-edms/postgres:/var/lib/postgresql/data
 
