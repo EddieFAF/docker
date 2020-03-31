@@ -5,6 +5,8 @@ services:
   coder:
     image: linuxserver/code-server
     container_name: coder
+    networks:
+      - web
     volumes:
       - ${USERDIR}:/home/coder/project
       - ${DATADIR}/coder/config:/config
@@ -14,7 +16,23 @@ services:
       - TZ=${TZ}
       - PASSWORD=password #optional
       - SUDO_PASSWORD=password #optional
-    ports:
-      - 8443:8443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.coder.entrypoints=http"
+      - "traefik.http.routers.coder.rule=Host(`coder.eisvogelweg2.de`)"
+      - "traefik.http.routers.coder.middlewares=https-redirect@file"
+      - "traefik.http.routers.coder-sec.entrypoints=https"
+      - "traefik.http.routers.coder-sec.middlewares=default-headers@file"
+      - "traefik.http.routers.coder-sec.rule=Host(`coder.eisvogelweg2.de`)"
+      - "traefik.http.routers.coder-sec.tls=true"
+      - "traefik.http.routers.coder-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.coder-sec.tls.certresolver=le"
+      - "traefik.http.services.coder.loadbalancer.server.port=8443"
+      - "com.centurylinklabs.watchtower.enable=true"
+#    ports:
+#      - 8443:8443
     restart: unless-stopped
 
+networks:
+  web:
+    external: true
