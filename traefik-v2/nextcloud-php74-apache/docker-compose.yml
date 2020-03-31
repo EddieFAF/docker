@@ -38,7 +38,7 @@ services:
 #   - "traefik.http.routers.nextcloud-sec.middlewares=calcarddav"
   volumes:
    - /media/t1/nextclouddata:/var/www/html/data
-   - /home/eddie/docker-data/nextcloud/wwwdata:/var/www/html
+   - ${DATADIR}/nextcloud/wwwdata:/var/www/html
   external_links:
    - mariadbmaster
 
