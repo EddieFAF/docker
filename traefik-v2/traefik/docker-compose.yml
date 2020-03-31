@@ -15,11 +15,11 @@ services:
       - 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data/traefik.yml:/traefik.yml:ro
-      - ./data/middleware.yml:/middleware.yml:ro
-      - ./data/.htpasswd:/.htpasswd:ro
-      - ./data/acme.json:/acme.json
-      - ./data/traefik.log:/traefik.log
+      - ${DATADIR}/traefik/data/traefik.yml:/traefik.yml:ro
+      - ${DATADIR}/traefik/data/middleware.yml:/middleware.yml:ro
+      - ${DATADIR}/traefik/data/.htpasswd:/.htpasswd:ro
+      - ${DATADIR}/traefik/data/acme.json:/acme.json
+      - ${DATADIR}/traefik/data/traefik.log:/traefik.log
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"

@@ -12,9 +12,9 @@ services:
       - intern
     environment:
      - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
-     - DB_NAME=intern
-     - DB_USER=eddie
-     - DB_PASS=terror
+     - DB_NAME=${DB_NAME}
+     - DB_USER=${DB_USER}
+     - DB_PASS=${DB_PASSWORD}
      - DB_BACKUP=true
      - DB_BACKUP_DUMP_FREQ=1440
      - DB_BACKUP_DUMP_BEGIN=0000
