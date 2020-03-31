@@ -10,6 +10,8 @@ services:
     container_name: mariadb
     networks:
       - intern
+    ports:
+     - 127.0.0.1:3306:3306
     environment:
      - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
      - DB_NAME=${DB_NAME}
