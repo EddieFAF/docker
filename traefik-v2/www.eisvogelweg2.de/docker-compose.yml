@@ -1,0 +1,46 @@
+version: "3.3"
+services:
+
+# NGINX as Webserver for www.eisvogelweg2.de
+  nginx:
+    container_name: www-site1
+    restart: unless-stopped
+    image: linuxserver/nginx
+    volumes:
+      - ${DATADIR}/nginx/config:/config
+#    ports:
+#      - 50080:80
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    networks:
+      - traefik_proxy
+    labels:
+      - traefik.enable=true
+      - traefik.backend=www
+#      - traefik.domain=eisvogelweg2.de
+      - traefik.frontend.rule=Host:www.${DOMAINNAME}
+#      - traefik.frontend.rule=Host:www.eisvogelweg2.de
+#      - traefik.docker.network=traefik_proxy
+      - traefik.port=80
+#      - traefik.frontend.headers.SSLRedirect=true
+#      - traefik.frontend.headers.STSSeconds=315360000
+#      - traefik.frontend.headers.browserXSSFilter=true
+#      - traefik.frontend.headers.contentTypeNosniff=true
+#      - traefik.frontend.headers.forceSTSHeader=true
+#      - traefik.frontend.headers.SSLHost=eisvogelweg2.de
+#      - traefik.frontend.headers.STSIncludeSubdomains=true
+#      - traefik.frontend.headers.STSPreload=true
+#      - traefik.frontend.headers.frameDeny=true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://www.eisvogelweg2.de || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+
