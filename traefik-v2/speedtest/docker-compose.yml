@@ -1,0 +1,36 @@
+version: "3.3"
+services:
+
+# Speedtest
+  speedtest:
+    container_name: speedtest
+    restart: unless-stopped
+    image: roest/docker-speedtest-analyser
+    networks:
+      - web
+    volumes:
+      - ${DATADIR}/speedtest/config:/var/www/html/data
+    ports:
+      - 51080:80
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bitwarden.entrypoints=http"
+      - "traefik.http.routers.bitwarden.rule=Host(`speed.eisvogelweg2.de`)"
+      - "traefik.http.routers.bitwarden.middlewares=https-redirect@file"
+      - "traefik.http.routers.bitwarden-sec.entrypoints=https"
+      - "traefik.http.routers.bitwarden-sec.middlewares=default-headers@file"
+      - "traefik.http.routers.bitwarden-sec.rule=Host(`speed.eisvogelweg2.de`)"
+      - "traefik.http.routers.bitwarden-sec.tls=true"
+      - "traefik.http.routers.bitwarden-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.bitwarden-sec.tls.certresolver=le"
+      - "traefik.http.services.bitwarden.loadbalancer.server.port=80"
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  web:
+    external: true
+
