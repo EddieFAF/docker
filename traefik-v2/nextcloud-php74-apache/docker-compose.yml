@@ -17,9 +17,9 @@ services:
    - 80
   environment:
    MYSQL_HOST: mariadbmaster:3306
-   MYSQL_PASSWORD: 'terror'
-   MYSQL_DATABASE: nextcloud
-   MYSQL_USER: nextcloud
+   MYSQL_PASSWORD: ${DB_PASSWORD}
+   MYSQL_DATABASE: ${DB_NAME}
+   MYSQL_USER: ${DB_USER}
   labels:
    - "traefik.enable=true"
    - "traefik.http.routers.nextcloud.entrypoints=http"
