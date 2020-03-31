@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+
+# Coder
+  coder:
+    image: codercom/code-server
+    container_name: coder
+    command: '--no-auth --allow-http'
+    expose:
+     - 8443
+    volumes:
+     - ${USERDIR}/repositories/docker:/home/coder/project
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.coder.entrypoints=http"
+      - "traefik.http.routers.coder.rule=Host(`coder.eisvogelweg2.de`)"
+      - "traefik.http.routers.coder.middlewares=https-redirect@file"
+      - "traefik.http.routers.coder-sec.entrypoints=https"
+      - "traefik.http.routers.coder-sec.middlewares=default-headers@file"
+      - "traefik.http.routers.coder-sec.rule=Host(`coder.eisvogelweg2.de`)"
+      - "traefik.http.routers.coder-sec.tls=true"
+      - "traefik.http.routers.coder-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.coder-sec.tls.certresolver=le"
+      - "traefik.http.services.coder.loadbalancer.server.port=8443"
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  web:
+    external: true
+
