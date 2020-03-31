@@ -1,0 +1,36 @@
+##START
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+api:
+  dashboard: true
+  debug: true
+
+log:
+###  Default Level is ERROR.
+  level: INFO
+  filePath: "/traefik.log"
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    network: web
+    exposedByDefault: false
+
+  file:
+    filename: /middleware.yml
+
+certificatesResolvers:
+  le:
+    acme:
+      email: eddie.faf@googlemail.com
+      storage: acme.json
+      tlsChallenge: {}
+

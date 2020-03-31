@@ -1,0 +1,40 @@
+### phpMyAdmin
+### docker-compose.yml
+###
+##START
+version: '3'
+services:
+ phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  restart: "no"
+  container_name: phpmyadmin
+  networks:
+    - intern
+    - web
+  ports:
+   - 80
+  environment:
+   PMA_HOST: mariadbmaster
+  labels:
+   - "traefik.enable=true"
+   - "traefik.http.routers.phpmyadmin.entrypoints=http"
+   - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.eisvogelweg2.de`)"
+   - "traefik.http.routers.phpmyadmin.middlewares=https-redirect@file"
+   - "traefik.http.routers.phpmyadmin-sec.entrypoints=https"
+#   - "traefik.http.routers.phpmyadmin-sec.middlewares=default-headers@file"
+   - "traefik.http.routers.phpmyadmin-sec.middlewares=traefik-auth"
+   - "traefik.http.routers.phpmyadmin-sec.rule=Host(`phpmyadmin.eisvogelweg2.de`)"
+   - "traefik.http.routers.phpmyadmin-sec.tls=true"
+   - "traefik.http.routers.phpmyadmin-sec.tls.options=myTLSOptions@file"
+   - "traefik.http.routers.phpmyadmin-sec.tls.certresolver=le"
+  volumes:
+   - /sessions
+  external_links:
+   - mariadbmaster
+networks:
+  intern:
+    external: true
+  web:
+    external: true
+##EOF
+

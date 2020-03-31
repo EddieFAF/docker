@@ -1,0 +1,69 @@
+### Traefik v2.1
+### docker-compose.yml
+##START
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v2.1
+    container_name: traefik-v2
+    restart: always
+    networks:
+      - web
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/traefik.yml:/traefik.yml:ro
+      - ./data/middleware.yml:/middleware.yml:ro
+      - ./data/.htpasswd:/.htpasswd:ro
+      - ./data/acme.json:/acme.json
+      - ./data/traefik.log:/traefik.log
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.eisvogelweg2.de`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.usersfile=.htpasswd"
+      - "traefik.http.routers.traefik.middlewares=https-redirect@file"
+      - "traefik.http.routers.traefik-sec.entrypoints=https"
+      - "traefik.http.routers.traefik-sec.rule=Host(`traefik.eisvogelweg2.de`)"
+      - "traefik.http.routers.traefik-sec.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-sec.tls=true"
+      - "traefik.http.routers.traefik-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.traefik-sec.tls.certresolver=le"
+      - "traefik.http.routers.traefik-sec.service=api@internal"
+
+
+# DDNS updates at Cloudflare
+  cloudflare-ddns:
+    container_name: cloudflare-ddns
+    hostname: cloudflare
+    image: oznu/cloudflare-ddns:latest
+    restart: always
+    networks:
+      - web
+    environment:
+      - EMAIL=eddie.faf@googlemail.com
+      - API_KEY=${API_KEY_1}
+      - ZONE=eisvogelweg2.de
+      - PROXIED=false
+
+# DDNS updates at Cloudflare
+  cloudflare-ddns2:
+    container_name: cloudflare-ddns2
+    hostname: cloudflare2
+    image: oznu/cloudflare-ddns:latest
+    restart: always
+    networks:
+      - web
+    environment:
+      - EMAIL=eddie.faf@googlemail.com
+      - API_KEY=${API_KEY_2}
+      - ZONE=honkhausen.de
+      - PROXIED=false
+
+networks:
+  web:
+    external: true
+

@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - web
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DATADIR}/portainer/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.entrypoints=http"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.eisvogelweg2.de`)"
+      - "traefik.http.routers.portainer.middlewares=https-redirect@file"
+      - "traefik.http.routers.portainer-sec.entrypoints=https"
+      - "traefik.http.routers.portainer-sec.middlewares=default-headers@file"
+      - "traefik.http.routers.portainer-sec.rule=Host(`portainer.eisvogelweg2.de`)"
+      - "traefik.http.routers.portainer-sec.tls=true"
+      - "traefik.http.routers.portainer-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.portainer-sec.tls.certresolver=le"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+
+networks:
+  web:
+    external: true
+

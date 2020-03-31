@@ -1,0 +1,34 @@
+### MariaDB
+### docker-compose.yml
+##Start
+version: '3'
+services:
+
+  mariadbmaster:
+    image: tiredofit/mariadb:latest
+    restart: always
+    container_name: mariadb
+    networks:
+      - intern
+    environment:
+     - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
+     - DB_NAME=intern
+     - DB_USER=eddie
+     - DB_PASS=terror
+     - DB_BACKUP=true
+     - DB_BACKUP_DUMP_FREQ=1440
+     - DB_BACKUP_DUMP_BEGIN=0000
+     - DB_BACKUP_CLEANUP_TIME=8640
+     - DB_BACKUP_MD=true
+     - DB_BACKUP_COMPRESSION=GZ
+     - DB_BACKUP_SPLIT_DB=false
+
+    volumes:
+     - ${DATADIR}/mariadbmaster/data:/var/lib/mysql
+       #     - ./conf:/etc/mysql/mariadb.conf.d
+     - ./dbbackup:/backup
+
+networks:
+  intern:
+    external: true
+##EOF

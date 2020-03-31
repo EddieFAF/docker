@@ -1,0 +1,43 @@
+version: "3.3"
+services:
+
+# OpenVPN Server
+  openvpn:
+    image: kylemanna/openvpn
+    container_name: openvpn
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "1194:1194/udp"
+    expose:
+      - 1194
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - ${DATADIR}/openvpn/config:/etc/openvpn
+    devices:
+      - /dev/net/tun
+    environment:
+#      - VIRTUAL_PORT=1194
+      - VIRTUAL_HOST=vpn.${DOMAINNAME}
+      - LETSENCRYPT_HOST=vpn.${DOMAINNAME}
+      - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.openvpn.entrypoints=http"
+      - "traefik.http.routers.openvpn.rule=Host(`vpn.eisvogelweg2.de`)"
+      - "traefik.http.routers.openvpn.middlewares=https-redirect@file"
+      - "traefik.http.routers.openvpn-secure.entrypoints=https"
+      - "traefik.http.routers.openvpn-secure.middlewares=default-headers@file"
+      - "traefik.http.routers.openvpn-secure.rule=Host(`vpn.eisvogelweg2.de`)"
+      - "traefik.http.routers.openvpn-secure.tls=true"
+      - "traefik.http.routers.openvpn-secure.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.openvpn-secure.tls.certresolver=le"
+      - "traefik.http.services.openvpn.loadbalancer.server.port=1194"
+
+networks:
+  web:
+    external: true
+
