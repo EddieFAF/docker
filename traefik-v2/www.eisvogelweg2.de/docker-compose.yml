@@ -3,11 +3,11 @@ services:
 
 # NGINX as Webserver for www.eisvogelweg2.de
   nginx:
-    container_name: www-site1
+    container_name: www.eisvogelweg2.de
     restart: unless-stopped
     image: linuxserver/nginx
     volumes:
-      - ${DATADIR}/nginx/config:/config
+      - ${DATADIR}/www.eisvogelweg2.de/config:/config
 #    ports:
 #      - 50080:80
     environment:
@@ -15,24 +15,20 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     networks:
-      - traefik_proxy
+      - web
     labels:
-      - traefik.enable=true
-      - traefik.backend=www
-#      - traefik.domain=eisvogelweg2.de
-      - traefik.frontend.rule=Host:www.${DOMAINNAME}
-#      - traefik.frontend.rule=Host:www.eisvogelweg2.de
-#      - traefik.docker.network=traefik_proxy
-      - traefik.port=80
-#      - traefik.frontend.headers.SSLRedirect=true
-#      - traefik.frontend.headers.STSSeconds=315360000
-#      - traefik.frontend.headers.browserXSSFilter=true
-#      - traefik.frontend.headers.contentTypeNosniff=true
-#      - traefik.frontend.headers.forceSTSHeader=true
-#      - traefik.frontend.headers.SSLHost=eisvogelweg2.de
-#      - traefik.frontend.headers.STSIncludeSubdomains=true
-#      - traefik.frontend.headers.STSPreload=true
-#      - traefik.frontend.headers.frameDeny=true
+      - "traefik.enable=true"
+      - "traefik.http.routers.eisvogelweg2.entrypoints=http"
+      - "traefik.http.routers.eisvogelweg2.rule=Host(`www.eisvogelweg2.de`)"
+      - "traefik.http.routers.eisvogelweg2.middlewares=https-redirect@file"
+      - "traefik.http.routers.eisvogelweg2-sec.entrypoints=https"
+      - "traefik.http.routers.eisvogelweg2-sec.middlewares=default-headers@file"
+      - "traefik.http.routers.eisvogelweg2-sec.rule=Host(`www.eisvogelweg2.de`)"
+      - "traefik.http.routers.eisvogelweg2-sec.tls=true"
+      - "traefik.http.routers.eisvogelweg2-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.eisvogelweg2-sec.tls.certresolver=le"
+      - "traefik.http.services.eisvogelweg2.loadbalancer.server.port=80"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://www.eisvogelweg2.de || exit 1"]
       interval: 1m30s
@@ -40,7 +36,5 @@ services:
       retries: 5
 
 networks:
-  traefik_proxy:
-    external:
-      name: traefik_proxy
-
+  web:
+    external: true
