@@ -25,6 +25,7 @@ services:
       - "traefik.http.routers.portainer-sec.tls.options=myTLSOptions@file"
       - "traefik.http.routers.portainer-sec.tls.certresolver=le"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
   web:

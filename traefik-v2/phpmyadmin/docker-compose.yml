@@ -27,6 +27,7 @@ services:
    - "traefik.http.routers.phpmyadmin-sec.tls=true"
    - "traefik.http.routers.phpmyadmin-sec.tls.options=myTLSOptions@file"
    - "traefik.http.routers.phpmyadmin-sec.tls.certresolver=le"
+   - "com.centurylinklabs.watchtower.enable=true"
   volumes:
    - /sessions
   external_links:
