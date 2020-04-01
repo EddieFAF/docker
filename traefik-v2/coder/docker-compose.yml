@@ -3,7 +3,8 @@ services:
 
 # Coder
   coder:
-    image: linuxserver/code-server
+#    image: linuxserver/code-server
+    image: codercom/code-server
     container_name: coder
     networks:
       - web
