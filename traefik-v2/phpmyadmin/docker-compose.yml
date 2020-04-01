@@ -6,7 +6,7 @@ version: '3'
 services:
  phpmyadmin:
   image: phpmyadmin/phpmyadmin
-  restart: "no"
+  restart: "unless-stopped"
   container_name: phpmyadmin
   networks:
     - intern
