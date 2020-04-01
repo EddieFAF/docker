@@ -10,10 +10,12 @@ services:
       - intern
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 600 --cleanup --label-enable
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=false
+      - WATCHTOWER_POLL_INTERVALL=600
       - WATCHTOWER_NOTIFICATIONS=email
       - WATCHTOWER_NOTIFICATION_EMAIL_FROM=eddie.faf@gmail.com
       - WATCHTOWER_NOTIFICATION_EMAIL_TO=eddie.faf@gmail.com
