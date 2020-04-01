@@ -5,7 +5,7 @@ services:
   watchtower:
     container_name: watchtower
     restart: always
-    image: containrrr/watchtower
+    image: v2tec/watchtower
     networks:
       - intern
     volumes:
