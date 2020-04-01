@@ -28,7 +28,7 @@ services:
       - "traefik.http.routers.coder-sec.tls=true"
       - "traefik.http.routers.coder-sec.tls.options=myTLSOptions@file"
       - "traefik.http.routers.coder-sec.tls.certresolver=le"
-      - "traefik.http.services.coder.loadbalancer.server.port=8443"
+      - "traefik.http.services.coder.loadbalancer.server.port=8080"
       - "com.centurylinklabs.watchtower.enable=true"
 #    ports:
 #      - 8443:8443
