@@ -130,7 +130,7 @@ RUN a2enmod rewrite remoteip headers;\
     } > /etc/apache2/conf-available/remoteip.conf;\
     a2enconf remoteip
 
-ENV NEXTCLOUD_VERSION 18.0.2
+ENV NEXTCLOUD_VERSION 18.0.3
 
 RUN set -ex; \
     fetchDeps=" \
@@ -175,12 +175,12 @@ RUN { \
         echo 'tls_certcheck off'; \
         echo '# Setup mail to send emails via SMTP'; \
         echo 'account mail'; \
-        echo 'host mein.mailserver.de'; \
+        echo 'host smtp.gmail.com'; \
         echo 'port 587'; \
         echo 'auth login'; \
-        echo 'user mail@mein.mailserver.de'; \
-        echo 'from mail@mein.mailserver.de'; \
-        echo 'password supergeheimesmailpasswort'; \
+        echo 'user eddie.faf@gmail.com'; \
+        echo 'from eddie.faf@gmail.com'; \
+        echo 'password ahvsqakkrewzxqby'; \
         echo '# Set a default account'; \
         echo 'account default : mail'; \
 } > /etc/msmtprc \

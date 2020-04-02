@@ -20,6 +20,8 @@ services:
    MYSQL_PASSWORD: ${DB_PASSWORD}
    MYSQL_DATABASE: ${DB_NAME}
    MYSQL_USER: ${DB_USER}
+   REDIS_HOST: redis-app
+   REDIS_HOST_PASSWORD: 9f1297a5793ed18422d3ec92a0eb23d9d91e68d7524937af6248d0ed6b6d006f
   labels:
    - "traefik.enable=true"
    - "traefik.http.routers.nextcloud.entrypoints=http"
@@ -41,6 +43,7 @@ services:
    - ${DATADIR}/nextcloud/wwwdata:/var/www/html
   external_links:
    - mariadbmaster
+   - redis-app
 
 networks:
   intern:
