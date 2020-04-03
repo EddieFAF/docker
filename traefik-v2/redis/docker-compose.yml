@@ -5,7 +5,7 @@ services:
     image: tiredofit/redis:latest
     container_name: redis-app
     volumes:
-    - ./data:/data/db
+    - ${DATADIR}/redis/data:/data/db
     #- ./logs:/data/logs
     environment: 
     - ZABBIX_HOSTNAME=redis-app
