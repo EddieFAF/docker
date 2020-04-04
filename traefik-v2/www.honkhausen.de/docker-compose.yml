@@ -1,0 +1,42 @@
+version: "3.3"
+services:
+
+# NGINX as Webserver for www.honkhausen.de
+  www-site2:
+    container_name: www.honkhausen.de
+    restart: unless-stopped
+    image: linuxserver/nginx
+    volumes:
+      - ${DATADIR}/www.honkhausen.de/config:/config
+#    ports:
+#      - 1080:80
+#      - 1443:443
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.honkhausen.entrypoints=http"
+      - "traefik.http.routers.honkhausen2.rule=Host(`www.honkhausen.de`)"
+      - "traefik.http.routers.honkhausen.middlewares=https-redirect@file"
+      - "traefik.http.routers.honkhausen-sec.entrypoints=https"
+      - "traefik.http.routers.honkhausen-sec.middlewares=default-headers@file"
+      - "traefik.http.routers.honkhausen-sec.rule=Host(`www.honkhausen.de`)"
+      - "traefik.http.routers.honkhausen-sec.tls=true"
+      - "traefik.http.routers.honkhausen-sec.tls.options=myTLSOptions@file"
+      - "traefik.http.routers.honkhausen-sec.tls.certresolver=le"
+      - "traefik.http.services.honkhausen.loadbalancer.server.port=80"
+      - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://www.honkhausen.de || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  web:
+    external: true
+ 
