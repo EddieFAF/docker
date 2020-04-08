@@ -1,42 +1,160 @@
----
-version: "2"
-services:
-  mayan:
-    image: mayanedms/mayanedms:latest
-    container_name: mayan-edms
-    environment:
-      - MAYAN_DATABASE_ENGINE=django.db.backends.postgresql
-      - MAYAN_DATABASE_HOST=mayan-edms-postgres
-      - MAYAN_DATABASE_NAME=mayan
-      - MAYAN_DATABASE_PASSWORD=mayanuserpass
-      - MAYAN_DATABASE_USER=mayan
-      - MAYAN_DATABASE_CONN_MAX_AGE=0
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${DATADIR}/mayan-edms/media:/var/lib/mayan
-      - /media/t3/mayan-edms/files/staging:/staging_files
-      - /media/t3/mayan-edms/files/watching:/watching_files
-    ports:
-      - 81:8000
-    restart: unless-stopped
-
-  mayan-edms-postgres:
-    image: postgres:9.6
-    container_name: mayan-edms-postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=mayan
-      - POSTGRES_DB=mayan
-      - POSTGRES_PASSWORD=mayanuserpass
-    volumes:
-      - /home/eddie/docker-data/mayan-edms/postgres:/var/lib/postgresql/data
+version: '3.7'
 
 networks:
-  default:
-    external:
-      name: mayan
+  bridge:
+    driver: bridge
 
+services:
+  app:
+    depends_on:
+      - postgresql
+      - redis
+      # Enable to use RabbitMQ
+      #- rabbitmq
+    environment: &mayan_env
+      # Enable to use RabbitMQ
+      # MAYAN_CELERY_BROKER_URL: amqp://${MAYAN_RABBITMQ_USER:-mayan}:${MAYAN_RABBITMQ_PASSWORD:-mayanrabbitpass}@rabbitmq:5672/${MAYAN_RABBITMQ_VHOST:-mayan}
+      # To use RabbitMQ as broker, disable Redis as broker
+      MAYAN_CELERY_BROKER_URL: redis://:${MAYAN_REDIS_PASSWORD:-mayanredispassword}@redis:6379/0
+      MAYAN_CELERY_RESULT_BACKEND: redis://:${MAYAN_REDIS_PASSWORD:-mayanredispassword}@redis:6379/1
+      MAYAN_DATABASES: "{'default':{'ENGINE':'django.db.backends.postgresql','NAME':'${MAYAN_DATABASE_DB:-mayan}','PASSWORD':'${MAYAN_DATABASE_PASSWORD:-mayandbpass}','USER':'${MAYAN_DATABASE_USER:-mayan}','HOST':'postgresql'}}"
+      MAYAN_DOCKER_WAIT: "postgresql:5432 redis:6379"
+      # Replace with the line below when using RabbitMQ
+      # MAYAN_DOCKER_WAIT: "postgresql:5432 redis:6379 rabbitmq:5672"
+      # To add operating system packages, like additional OCR language,
+      # packages, put then in the variable below.
+      # MAYAN_APT_INSTALLS: "tesseract-ocr-deu tesseract-ocr-nld"
+      # To add Python libraries, like LDAP, put then in the variable below.
+      # MAYAN_PIP_INSTALLS: "python-ldap"
+    image: mayanedms/mayanedms:3
+    networks:
+      - bridge
+    ports:
+      - "8050:8000"
+    restart: unless-stopped
+    volumes:
+      - ${MAYAN_APP_VOLUME:-app}:/var/lib/mayan
+      # Optional volumes to access external data like staging or watch folders
+      # - /opt/staging_files:/staging_files
+      # - /opt/watch_folder:/watch_folder
+      - /media/t3/mayan-edms/files/staging:/staging_files
+      - /media/t3/mayan-edms/files/watching:/watch_folder
+
+  postgresql:
+    environment:
+      POSTGRES_DB: ${MAYAN_DATABASE_DB:-mayan}
+      POSTGRES_PASSWORD: ${MAYAN_DATABASE_PASSWORD:-mayandbpass}
+      POSTGRES_USER: ${MAYAN_DATABASE_USER:-mayan}
+    image: postgres:9.6-alpine
+    networks:
+      - bridge
+    restart: unless-stopped
+    volumes:
+      - ${MAYAN_POSTGRES_VOLUME:-postgres}:/var/lib/postgresql/data
+
+  redis:
+    command:
+      - redis-server
+      - --appendonly
+      - "no"
+      - --databases
+      - "2"
+      - --maxmemory
+      - "100mb"
+      - --maxclients
+      - "500"
+      - --maxmemory-policy
+      - "allkeys-lru"
+      - --save
+      - ""
+      - --tcp-backlog
+      - "256"
+      - --requirepass
+      - "${MAYAN_REDIS_PASSWORD:-mayanredispassword}"
+    image: redis:5.0-alpine
+    networks:
+      - bridge
+    restart: unless-stopped
+    volumes:
+      - ${MAYAN_REDIS_VOLUME:-redis}:/data
+  # Optional services
+
+  # celery_flower:
+  #   command:
+  #     - run_celery
+  #     - flower
+  #   depends_on:
+  #     - postgresql
+  #     - results
+  #     # Enable to use RabbitMQ
+  #     # - rabbitmq
+  #   environment:
+  #     <<: *mayan_env
+  #   image: mayanedms/mayanedms:3
+  #   networks:
+  #     - bridge
+  #   ports:
+  #     - "5555:5555"
+  #   restart: unless-stopped
+
+  # Enable to use RabbitMQ
+  # rabbitmq:
+  #   container_name: mayan-edms-rabbitmq
+  #   hostname: mayan-edms-rabbitmq
+  #   image: healthcheck/rabbitmq
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: ${MAYAN_RABBITMQ_USER:-mayan}
+  #     RABBITMQ_DEFAULT_PASS: ${MAYAN_RABBITMQ_PASSWORD:-mayanrabbitpass}
+  #     RABBITMQ_DEFAULT_VHOST: ${MAYAN_RABBITMQ_VHOST:-mayan}
+  #   networks:
+  #     - bridge
+  #   restart: unless-stopped
+  #   volumes:
+  #      - ${MAYAN_RABBITMQ_VOLUME:-rabbitmq}:/var/lib/rabbitmq
+
+  # Enable to run standalone workers
+  # worker_fast:
+  #   command:
+  #     - run_worker
+  #     - fast
+  #   depends_on:
+  #     - db
+  #     - results
+  #     # Enable to use RabbitMQ
+  #     # - rabbitmq
+  #   environment:
+  #     <<: *mayan_env
+  #   image: mayanedms/mayanedms:3
+  #   networks:
+  #     - bridge
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ${MAYAN_APP_VOLUME:-app}:/var/lib/mayan
+
+  # Enable to run frontend gunicorn
+  # frontend:
+  #   command:
+  #     - run_frontend
+  #   depends_on:
+  #     - db
+  #     - results
+  #     # Enable to use RabbitMQ
+  #     # - rabbitmq
+  #   environment:
+  #     <<: *mayan_env
+  #   image: mayanedms/mayanedms:3
+  #   networks:
+  #     - bridge
+  #   ports:
+  #     - "81:8000"
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ${MAYAN_APP_VOLUME:-app}:/var/lib/mayan
+
+volumes:
+  app:
+  postgres:
+  rabbitmq:
+  redis:
 
 
