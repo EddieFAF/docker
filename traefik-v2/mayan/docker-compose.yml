@@ -23,9 +23,11 @@ services:
       # MAYAN_DOCKER_WAIT: "postgresql:5432 redis:6379 rabbitmq:5672"
       # To add operating system packages, like additional OCR language,
       # packages, put then in the variable below.
-      # MAYAN_APT_INSTALLS: "tesseract-ocr-deu tesseract-ocr-nld"
+      MAYAN_APT_INSTALLS: "tesseract-ocr-deu"
       # To add Python libraries, like LDAP, put then in the variable below.
       # MAYAN_PIP_INSTALLS: "python-ldap"
+      MAYAN_DOCUMENTS_LANGUAGE_CODE: "['deu', 'eng']"
+      MAYAN_DOCUMENTS_LANGUAGE: "deu"
     image: mayanedms/mayanedms:3
     networks:
       - bridge
