@@ -7,7 +7,7 @@ version: '3'
 services:
 
  nextcloud:
-  image: nextcloud-php74-apache:latest
+  image: nextcloud-php74-apache:18.0.2
   container_name: nextcloud
   restart: always
   networks:
