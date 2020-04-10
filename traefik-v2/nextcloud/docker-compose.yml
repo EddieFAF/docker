@@ -1,18 +1,44 @@
+version: '3'
+services:
+
   nextcloud:
     image: crazymax/nextcloud:latest
     container_name: nextcloud
-    depends_on:
-      - db
-      - redis
-    ports:
-      - target: 8000
-        published: 8000
-        protocol: tcp
-    volumes:
-      - "nextcloud:/data"
-    env_file:
-      - "./nextcloud.env"
     restart: always
+    networks:
+      - intern
+      - web
+    ports:
+      - 80
+    environment:
+     MYSQL_HOST: mariadbmaster:3306
+     MYSQL_PASSWORD: ${DB_PASSWORD}
+     MYSQL_DATABASE: ${DB_NAME}
+     MYSQL_USER: ${DB_USER}
+      REDIS_HOST: redis-app
+     REDIS_HOST_PASSWORD: 9f1297a5793ed18422d3ec92a0eb23d9d91e68d7524937af6248d0ed6b6d006f
+    labels:
+     - "traefik.enable=true"
+     - "traefik.http.routers.nextcloud.entrypoints=http"
+     - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.eisvogelweg2.de`)"
+     - "traefik.http.routers.nextcloud.middlewares=https-redirect@file"
+     - "traefik.http.routers.nextcloud-sec.entrypoints=https"
+     - "traefik.http.routers.nextcloud-sec.middlewares=calcarddav,default-headers@file"
+     - "traefik.http.routers.nextcloud-sec.rule=Host(`nextcloud.eisvogelweg2.de`)"
+     - "traefik.http.routers.nextcloud-sec.tls=true"
+     - "traefik.http.routers.nextcloud-sec.tls.options=myTLSOptions@file"
+     - "traefik.http.routers.nextcloud-sec.tls.certresolver=le"
+     # Reverse-Proxy "Traefik" Redirects für CalDAV / CardDAV:
+     - "traefik.http.middlewares.calcarddav.redirectregex.permanent=true"
+     - "traefik.http.middlewares.calcarddav.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
+     - "traefik.http.middlewares.calcarddav.redirectregex.replacement=https://$$1/remote.php/dav/"
+     - "traefik.http.routers.nextcloud-sec.middlewares=calcarddav"
+    volumes:
+     - /media/t1/nextclouddata:/data
+     - ${DATADIR}/nextcloud/wwwdata:/var/www/html
+    external_links:
+     - mariadbmaster
+     - redis-app
 
   cron:
     image: crazymax/nextcloud:latest
@@ -20,12 +46,17 @@
     depends_on:
       - nextcloud
     volumes:
-      - "nextcloud:/data"
-    env_file:
-      - "./nextcloud.env"
+     - /media/t1/nextclouddata:/data
+#    env_file:
+#      - "./nextcloud.env"
     environment:
       - "SIDECAR_CRON=1"
       - "CRON_PERIOD=*/15 * * * *"
     restart: always
 
-
+networks:
+  intern:
+    external: true
+  web:
+    external: true
+##EOF
