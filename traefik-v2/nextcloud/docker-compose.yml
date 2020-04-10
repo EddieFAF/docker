@@ -1,0 +1,31 @@
+  nextcloud:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud
+    depends_on:
+      - db
+      - redis
+    ports:
+      - target: 8000
+        published: 8000
+        protocol: tcp
+    volumes:
+      - "nextcloud:/data"
+    env_file:
+      - "./nextcloud.env"
+    restart: always
+
+  cron:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud_cron
+    depends_on:
+      - nextcloud
+    volumes:
+      - "nextcloud:/data"
+    env_file:
+      - "./nextcloud.env"
+    environment:
+      - "SIDECAR_CRON=1"
+      - "CRON_PERIOD=*/15 * * * *"
+    restart: always
+
+
