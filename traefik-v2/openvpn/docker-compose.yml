@@ -36,6 +36,7 @@ services:
       - "traefik.http.routers.openvpn-secure.tls.options=myTLSOptions@file"
       - "traefik.http.routers.openvpn-secure.tls.certresolver=le"
       - "traefik.http.services.openvpn.loadbalancer.server.port=1194"
+      - com.centurylinklabs.watchtower.enable=true
 
 networks:
   web:

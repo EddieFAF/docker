@@ -38,6 +38,7 @@ services:
    - "traefik.http.middlewares.calcarddav.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
    - "traefik.http.middlewares.calcarddav.redirectregex.replacement=https://$$1/remote.php/dav/"
 #   - "traefik.http.routers.nextcloud-sec.middlewares=calcarddav"
+   - com.centurylinklabs.watchtower.enable=false
   volumes:
    - /media/t1/nextclouddata:/var/www/html/data
    - ${DATADIR}/nextcloud/wwwdata:/var/www/html
