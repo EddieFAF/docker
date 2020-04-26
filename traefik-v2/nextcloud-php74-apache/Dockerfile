@@ -11,6 +11,8 @@ RUN set -ex; \
         rsync \
         bzip2 \
         busybox-static \
+        sudo \
+        smbclient \
 ### msmtp Installation
         msmtp \
         msmtp-mta \
