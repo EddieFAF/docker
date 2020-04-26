@@ -5,6 +5,7 @@ services:
     image: portainer/portainer:latest
     container_name: portainer
     restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
     security_opt:
       - no-new-privileges:true
     networks:
@@ -13,18 +14,22 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATADIR}/portainer/data:/data
+    environment:
+      - TZ=$TZ
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.entrypoints=http"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.eisvogelweg2.de`)"
-      - "traefik.http.routers.portainer.middlewares=https-redirect@file"
-      - "traefik.http.routers.portainer-sec.entrypoints=https"
-      - "traefik.http.routers.portainer-sec.middlewares=default-headers@file"
-      - "traefik.http.routers.portainer-sec.rule=Host(`portainer.eisvogelweg2.de`)"
-      - "traefik.http.routers.portainer-sec.tls=true"
-      - "traefik.http.routers.portainer-sec.tls.options=myTLSOptions@file"
-      - "traefik.http.routers.portainer-sec.tls.certresolver=le"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      ## HTTP Routers
+      - "traefik.http.routers.portainer-rtr.entrypoints=https"
+      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+      - "traefik.http.routers.portainer-rtr.tls=true"
+      ## Middlewares
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
+      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+
       - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
