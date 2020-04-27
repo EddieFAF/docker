@@ -1,7 +1,7 @@
 ### MariaDB
 ### docker-compose.yml
 ##Start
-version: '3'
+version: '3.7'
 services:
 
   mariadbmaster:
@@ -9,9 +9,12 @@ services:
     restart: always
     container_name: mariadb
     networks:
-      - intern
+      t2_proxy:
+        ipv4_address: 192.168.90.250
+    security_opt:
+      - no-new-privileges:true
     ports:
-     - 127.0.0.1:3306:3306
+     - 3306:3306
     environment:
      - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
      - DB_NAME=${DB_NAME}
@@ -28,9 +31,11 @@ services:
     volumes:
      - ${DATADIR}/mariadbmaster/data:/var/lib/mysql
        #     - ./conf:/etc/mysql/mariadb.conf.d
+     - /etc/timezone:/etc/timezone:ro
+     - /etc/localtime:/etc/localtime:ro
      - ./dbbackup:/backup
 
 networks:
-  intern:
+  t2_proxy:
     external: true
 ##EOF

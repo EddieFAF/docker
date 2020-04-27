@@ -15,20 +15,21 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     networks:
-      - web
+      - t2_proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.eisvogelweg2.entrypoints=http"
-      - "traefik.http.routers.eisvogelweg2.rule=Host(`www.eisvogelweg2.de`)"
-      - "traefik.http.routers.eisvogelweg2.middlewares=https-redirect@file"
-      - "traefik.http.routers.eisvogelweg2-sec.entrypoints=https"
-      - "traefik.http.routers.eisvogelweg2-sec.middlewares=default-headers@file"
-      - "traefik.http.routers.eisvogelweg2-sec.rule=Host(`www.eisvogelweg2.de`)"
-      - "traefik.http.routers.eisvogelweg2-sec.tls=true"
-      - "traefik.http.routers.eisvogelweg2-sec.tls.options=myTLSOptions@file"
-      - "traefik.http.routers.eisvogelweg2-sec.tls.certresolver=le"
-      - "traefik.http.services.eisvogelweg2.loadbalancer.server.port=80"
-      - "com.centurylinklabs.watchtower.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.eisvogelweg2-rtr.entrypoints=https"
+      - "traefik.http.routers.eisvogelweg2-rtr.rule=Host(`www.$DOMAINNAME`)"
+      - "traefik.http.routers.eisvogelweg2-rtr.tls=true"
+#      - "traefik.http.routers.portainer-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.eisvogelweg2-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.eisvogelweg2-rtr.service=eisvogelweg2-svc"
+      - "traefik.http.services.eisvogelweg2-svc.loadbalancer.server.port=80"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://www.eisvogelweg2.de || exit 1"]
       interval: 1m30s
@@ -36,5 +37,5 @@ services:
       retries: 5
 
 networks:
-  web:
+  t2_proxy:
     external: true

@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   portainer:
@@ -9,7 +9,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - web
+      - t2_proxy
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -30,9 +30,7 @@ services:
       - "traefik.http.routers.portainer-rtr.service=portainer-svc"
       - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
 
-      - "com.centurylinklabs.watchtower.enable=true"
-
 networks:
-  web:
+  t2_proxy:
     external: true
 

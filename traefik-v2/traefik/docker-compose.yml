@@ -39,7 +39,8 @@ services:
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
     networks:
-      - web
+      t2_proxy:
+        ipv4_address: 192.168.90.254
     security_opt:
       - no-new-privileges:true
     ports:
@@ -114,7 +115,7 @@ services:
     image: thomseddon/traefik-forward-auth:latest
     restart: unless-stopped
     networks:
-      - web
+      - t2_proxy
     security_opt:
       - no-new-privileges:true
     environment:
@@ -149,7 +150,7 @@ services:
     image: oznu/cloudflare-ddns:latest
     restart: always
     networks:
-      - web
+      - t2_proxy
     environment:
       - EMAIL=eddie.faf@googlemail.com
       - API_KEY=${API_KEY_1}
@@ -163,14 +164,31 @@ services:
     image: oznu/cloudflare-ddns:latest
     restart: always
     networks:
-      - web
+      - t2_proxy
     environment:
       - EMAIL=eddie.faf@googlemail.com
       - API_KEY=${API_KEY_2}
       - ZONE=honkhausen.de
       - PROXIED=false
 
+  ouroboros:
+    container_name: ouroboros
+    hostname: ouroboros
+    image: pyouroboros/ouroboros
+    environment:
+      - CLEANUP=true
+      - INTERVAL=300
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+      - IGNORE=mongo influxdb postgres mariadb
+      - TZ=Europe/Berlin
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - t2_proxy
+
 networks:
-  web:
+  t2_proxy:
     external: true
 
