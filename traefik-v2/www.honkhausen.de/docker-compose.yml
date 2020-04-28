@@ -16,23 +16,22 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     networks:
-      - web
+      - t2_proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.honkhausen.entrypoints=http"
-      - "traefik.http.routers.honkhausen.rule=Host(`www.honkhausen.de`,`honkhausen.de`)"
-      - "traefik.http.routers.honkhausen.middlewares=https-redirect@file"
-      - "traefik.http.routers.honkhausen-sec.entrypoints=https"
-      - "traefik.http.routers.honkhausen-sec.middlewares=default-headers@file"
-      - "traefik.http.routers.honkhausen-sec.rule=Host(`www.honkhausen.de`,`honkhausen.de`)"
-        #      - "traefik.http.middlewares.honkhausen-redirect.redirectregex.regex=^https:\/\/(www.)honkhausen.de(.+)?"
-        #      - "traefik.http.middlewares.honkhausen-redirect.redirectregex.replacement=https://www.honkhausen.de$${3}"
-        #      - "traefik.http.middlewares.honkhausen-redirect.redirectregex.permanent=true"
-      - "traefik.http.routers.honkhausen-sec.tls=true"
-      - "traefik.http.routers.honkhausen-sec.tls.options=myTLSOptions@file"
-      - "traefik.http.routers.honkhausen-sec.tls.certresolver=le"
-      - "traefik.http.services.honkhausen.loadbalancer.server.port=80"
-      - "com.centurylinklabs.watchtower.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.honkhausen-rtr.entrypoints=https"
+      - "traefik.http.routers.honkhausen-rtr.rule=Host(`www.honkhausen.de`)"
+      - "traefik.http.routers.honkhausen-rtr.tls=true"
+#      - "traefik.http.routers.honkhausen-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.honkhausen-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.honkhausen-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.honkhausen-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.honkhausen-rtr.service=honkhausen-svc"
+      - "traefik.http.services.honkhausen-svc.loadbalancer.server.port=80"
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://www.honkhausen.de || exit 1"]
       interval: 1m30s
@@ -40,6 +39,6 @@ services:
       retries: 5
 
 networks:
-  web:
+  t2_proxy:
     external: true
  
