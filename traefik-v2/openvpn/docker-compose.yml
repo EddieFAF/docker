@@ -14,7 +14,7 @@ services:
       - 1194
     restart: unless-stopped
     networks:
-      - web
+      - t2_proxy
     volumes:
       - ${DATADIR}/openvpn/config:/etc/openvpn
     devices:
@@ -26,19 +26,20 @@ services:
       - LETSENCRYPT_EMAIL=eddie.faf@googlemail.com
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.openvpn.entrypoints=http"
-      - "traefik.http.routers.openvpn.rule=Host(`vpn.eisvogelweg2.de`)"
-      - "traefik.http.routers.openvpn.middlewares=https-redirect@file"
-      - "traefik.http.routers.openvpn-secure.entrypoints=https"
-      - "traefik.http.routers.openvpn-secure.middlewares=default-headers@file"
-      - "traefik.http.routers.openvpn-secure.rule=Host(`vpn.eisvogelweg2.de`)"
-      - "traefik.http.routers.openvpn-secure.tls=true"
-      - "traefik.http.routers.openvpn-secure.tls.options=myTLSOptions@file"
-      - "traefik.http.routers.openvpn-secure.tls.certresolver=le"
-      - "traefik.http.services.openvpn.loadbalancer.server.port=1194"
-      - com.centurylinklabs.watchtower.enable=true
+      ## HTTP Routers
+      - "traefik.http.routers.openvpn-rtr.entrypoints=https"
+      - "traefik.http.routers.openvpn-rtr.rule=Host(`vpn.$DOMAINNAME`)"
+      - "traefik.http.routers.openvpn-rtr.tls=true"
+#      - "traefik.http.routers.openvpn-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.openvpn-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.openvpn-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.openvpn-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.openvpn-rtr.service=openvpn-svc"
+      - "traefik.http.services.openvpn-svc.loadbalancer.server.port=1194"
 
 networks:
-  web:
+  t2_proxy:
     external: true
 
