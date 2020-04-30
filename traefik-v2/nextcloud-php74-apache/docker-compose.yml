@@ -7,7 +7,7 @@ version: '3'
 services:
 
  nextcloud:
-  image: nextcloud-php74-apache:18.0.3
+  image: nextcloud-php74-apache:latest
   container_name: nextcloud
   restart: always
   networks:
@@ -24,16 +24,18 @@ services:
    REDIS_HOST_PASSWORD: 9f1297a5793ed18422d3ec92a0eb23d9d91e68d7524937af6248d0ed6b6d006f
   labels:
     - "traefik.enable=true"
-    - "traefik.docker.network=t2_proxy"
-    ## TCP Routers
-    - "traefik.tcp.routers.nextcloud-tcp.entrypoints=https"
-    - "traefik.tcp.routers.nextcloud-tcp.rule=HostSNI(`nextcloud.$DOMAINNAME`)"
-    - "traefik.tcp.routers.nextcloud-tcp.tls=true"
-    - "traefik.tcp.routers.nextcloud-tcp.tls.certresolver=dns-cloudflare"
-    - "traefik.tcp.routers.nextcloud-tcp.tls.passthrough=true"
-    ## TCP Services
-    - "traefik.tcp.routers.nextcloud-tcp.service=nextcloud-tcp-svc"
-    - "traefik.tcp.services.nextcloud-tcp-svc.loadbalancer.server.port=443"
+    - "traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true"
+    - "traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav"
+    - "traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/"
+    - "traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https"
+    - "traefik.http.routers.nextcloud-http.entrypoints=http"
+    - "traefik.http.routers.nextcloud-http.rule=Host(`nextcloud.$DOMAINNAME`)"
+    - "traefik.http.routers.nextcloud-http.middlewares=nextcloud-https@docker"
+    - "traefik.http.routers.nextcloud.entrypoints=https"
+    - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.$DOMAINNAME`)"
+    - "traefik.http.routers.nextcloud.middlewares=nextcloud-caldav@docker"
+    - "traefik.http.routers.nextcloud.tls=true"
+    - "traefik.http.routers.nextcloud.tls.certresolver=default"
   volumes:
    - /media/t1/nextclouddata:/var/www/html/data
    - ${DATADIR}/nextcloud/wwwdata:/var/www/html
