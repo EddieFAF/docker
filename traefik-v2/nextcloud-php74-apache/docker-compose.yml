@@ -12,7 +12,7 @@ services:
   restart: always
   networks:
    - intern
-   - web
+   - t2_proxy
   ports:
    - 80
   environment:
@@ -23,22 +23,17 @@ services:
    REDIS_HOST: redis-app
    REDIS_HOST_PASSWORD: 9f1297a5793ed18422d3ec92a0eb23d9d91e68d7524937af6248d0ed6b6d006f
   labels:
-   - "traefik.enable=true"
-   - "traefik.http.routers.nextcloud.entrypoints=http"
-   - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.eisvogelweg2.de`)"
-   - "traefik.http.routers.nextcloud.middlewares=https-redirect@file"
-   - "traefik.http.routers.nextcloud-sec.entrypoints=https"
-   - "traefik.http.routers.nextcloud-sec.middlewares=calcarddav,default-headers@file"
-   - "traefik.http.routers.nextcloud-sec.rule=Host(`nextcloud.eisvogelweg2.de`)"
-   - "traefik.http.routers.nextcloud-sec.tls=true"
-   - "traefik.http.routers.nextcloud-sec.tls.options=myTLSOptions@file"
-   - "traefik.http.routers.nextcloud-sec.tls.certresolver=le"
-# Reverse-Proxy "Traefik" Redirects für CalDAV / CardDAV:
-   - "traefik.http.middlewares.calcarddav.redirectregex.permanent=true"
-   - "traefik.http.middlewares.calcarddav.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
-   - "traefik.http.middlewares.calcarddav.redirectregex.replacement=https://$$1/remote.php/dav/"
-#   - "traefik.http.routers.nextcloud-sec.middlewares=calcarddav"
-   - com.centurylinklabs.watchtower.enable=false
+    - "traefik.enable=true"
+    - "traefik.docker.network=t2_proxy"
+    ## TCP Routers
+    - "traefik.tcp.routers.nextcloud-tcp.entrypoints=https"
+    - "traefik.tcp.routers.nextcloud-tcp.rule=HostSNI(`nextcloud.$DOMAINNAME`)"
+    - "traefik.tcp.routers.nextcloud-tcp.tls=true"
+    - "traefik.tcp.routers.nextcloud-tcp.tls.certresolver=dns-cloudflare"
+    - "traefik.tcp.routers.nextcloud-tcp.tls.passthrough=true"
+    ## TCP Services
+    - "traefik.tcp.routers.nextcloud-tcp.service=nextcloud-tcp-svc"
+    - "traefik.tcp.services.nextcloud-tcp-svc.loadbalancer.server.port=443"
   volumes:
    - /media/t1/nextclouddata:/var/www/html/data
    - ${DATADIR}/nextcloud/wwwdata:/var/www/html
@@ -49,6 +44,6 @@ services:
 networks:
   intern:
     external: true
-  web:
+  t2_proxy:
     external: true
 ##EOF

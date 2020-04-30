@@ -5,7 +5,7 @@ services:
   www-site2:
     container_name: www.honkhausen.de
     restart: unless-stopped
-    image: linuxserver/nginx
+    image: linuxserver/nginx:latest
     volumes:
       - ${DATADIR}/www.honkhausen.de/config:/config
 #    ports:
