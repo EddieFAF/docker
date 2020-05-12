@@ -12,7 +12,7 @@ services:
       - ADMIN_TOKEN=${ADMIN_TOKEN}
       - LOG_FILE=/data/bitwarden.log
     networks:
-      - web
+      - t2_proxy
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -20,9 +20,9 @@ services:
       - "traefik.http.routers.bitwarden-rtr.rule=Host(`bitwarden.$DOMAINNAME`)"
       - "traefik.http.routers.bitwarden-rtr.tls=true"
       ## Middlewares
-#      - "traefik.http.routers.portainer-rtr.middlewares=chain-no-auth@file" # No Authentication
-#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-      - "traefik.http.routers.bitwarden-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      - "traefik.http.routers.bitwarden-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.bitwarden-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.bitwarden-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
       ## HTTP Services
       - "traefik.http.routers.bitwarden-rtr.service=bitwarden-svc"
       - "traefik.http.services.bitwarden-svc.loadbalancer.server.port=80"
@@ -30,6 +30,6 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
-  web:
+  t2_proxy:
     external: true
 
