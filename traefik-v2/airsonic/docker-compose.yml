@@ -1,0 +1,41 @@
+version: "2"
+services:
+  airsonic:
+    image: linuxserver/airsonic
+    container_name: airsonic
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+#      - CONTEXT_PATH=URL_BASE #optional
+#      - JAVA_OPTS=options #optional
+    volumes:
+      - ${DATADIR}/airsonic/config:/config
+      - /mnt/nasgard/Medien/Music:/music
+      - ${DATADIR}/airsonic/playlists:/playlists
+      - ${DATADIR}/airsonic/podcasts:/podcasts
+      - ${DATADIR}/airsonic/other:/media #optional
+    networks:
+      - t2_proxy
+    ports:
+      - 4040:4040
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.airsonic-rtr.entrypoints=https"
+      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.tls=true"
+#      - "traefik.http.routers.airsonic-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+#      - "traefik.http.routers.airsonic-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.airsonic-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+      - "traefik.http.routers.airsonic-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
+      - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+
+networks:
+  t2_proxy:
+    external: true
+

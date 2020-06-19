@@ -7,14 +7,14 @@ version: '3'
 services:
 
  nextcloud:
-  image: linuxserver/nextcloud
+  image: nextcloud-php74-apache:latest
   container_name: nextcloud
   restart: always
   networks:
    - intern
    - t2_proxy
   ports:
-    - 80
+   - 80
   environment:
    MYSQL_HOST: mariadbmaster:3306
    MYSQL_PASSWORD: ${DB_PASSWORD}
@@ -37,8 +37,8 @@ services:
     - "traefik.http.routers.nextcloud.tls=true"
     - "traefik.http.routers.nextcloud.tls.certresolver=default"
   volumes:
-   - ${DATADIR}/nextcloud/nextclouddata:/data
-   - ${DATADIR}/nextcloud/data:/config
+   - /media/t1/nextclouddata:/var/www/html/data
+   - ${DATADIR}/nextcloud/wwwdata:/var/www/html
   external_links:
    - mariadbmaster
    - redis-app
