@@ -54,7 +54,7 @@ services:
       - db
     labels:
       - traefik.enable=true
-      - traefik.http.routers.nextcloud.middlewares=nextcloud,nextcloud_redirect
+      - traefik.http.routers.nextcloud.middlewares=nextcloud,nextcloud-caldav
       - traefik.http.routers.nextcloud.tls.certresolver=default
       - traefik.http.routers.nextcloud.rule=Host(`nextcloud.eisvogelweg2.de`)
       - traefik.http.middlewares.nextcloud.headers.customFrameOptionsValue=ALLOW-FROM https://eisvogelweg2.de
