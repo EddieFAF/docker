@@ -43,7 +43,7 @@ services:
       - redis:/var/lib/redis
 
   nextcloud:
-    image: nextcloud:latest
+    image: nextcloud-smb:latest
     container_name: nextcloud
     restart: always
     networks:
@@ -62,8 +62,11 @@ services:
       - traefik.http.middlewares.nextcloud.headers.stsSeconds=155520011
       - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
       - traefik.http.middlewares.nextcloud.headers.stsPreload=true
-      - traefik.http.middlewares.nextcloud_redirect.redirectregex.regex=/.well-known/(card|cal)dav
-      - traefik.http.middlewares.nextcloud_redirect.redirectregex.replacement=/remote.php/dav/
+        #      - traefik.http.middlewares.nextcloud_redirect.redirectregex.regex=/.well-known/(card|cal)dav
+        #      - traefik.http.middlewares.nextcloud_redirect.redirectregex.replacement=/remote.php/dav/
+      - traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true
+      - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
+      - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
     environment:
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=nextcloud
