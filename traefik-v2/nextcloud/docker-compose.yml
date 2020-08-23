@@ -57,7 +57,7 @@ services:
       - traefik.http.routers.nextcloud.middlewares=nextcloud,nextcloud-caldav
       - traefik.http.routers.nextcloud.tls.certresolver=default
       - traefik.http.routers.nextcloud.rule=Host(`nextcloud.eisvogelweg2.de`)
-      - traefik.http.middlewares.nextcloud.headers.customFrameOptionsValue=ALLOW-FROM https://eisvogelweg2.de
+      - traefik.http.middlewares.nextcloud.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.nextcloud.headers.contentSecurityPolicy=frame-ancestors 'self' eisvogelweg2.de *.eisvogelweg2.de
       - traefik.http.middlewares.nextcloud.headers.stsSeconds=155520011
       - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
