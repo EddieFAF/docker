@@ -2,7 +2,7 @@ version: "3.3"
 services:
 
   clarkson-app:
-    image: linuxserver/clarkson
+    image: lsiodev/clarkson
     container_name: clarkson
     restart: always
     links:
