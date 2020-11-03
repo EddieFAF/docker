@@ -7,7 +7,7 @@ services:
   mariadbmaster:
     image: tiredofit/mariadb:latest
     restart: always
-    container_name: mariadb
+    container_name: mariadbmaster
     networks:
       t2_proxy:
         ipv4_address: 192.168.90.250

@@ -62,7 +62,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - ${DATADIR}/openvpn/config:/etc/openvpn
     environment:
-      OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m
+      OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m --log-append /etc/openvpn/openvpn.log
 
 networks:
   t2_proxy:

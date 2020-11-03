@@ -19,7 +19,7 @@ services:
       - ${DATADIR}/clarkson/data:/var/www/html
 #      - ${DATADIR}/wordpress/logs/:/www/logs
     ports:
-      - 3000:3000
+      - 3001:3000
     networks:
       - t2_proxy
 

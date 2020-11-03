@@ -9,15 +9,6 @@
 
 version: '3.3'
 
-volumes:
-  nextcloud-www:
-    driver: local
-  nextcloud-db:
-    driver: local
-  redis:
-    driver: local
-
-
 services:
 
   db:
@@ -31,7 +22,7 @@ services:
     - POSTGRES_PASSWORD=password
     - POSTGRES_DB=nextcloud
     volumes:
-    - nextcloud-db:/var/lib/postgresql/data
+    - /home/eddie/docker-data/nextcloud/db:/var/lib/postgresql/data
 
   redis:
     image: redis:latest
@@ -40,10 +31,10 @@ services:
     networks:
       - nextcloud
     volumes:
-      - redis:/var/lib/redis
+      - /home/eddie/docker-data/nextcloud/redis:/var/lib/redis
 
   nextcloud:
-    image: nextcloud-smb:latest
+    image: nextcloud:stable
     container_name: nextcloud
     restart: always
     networks:
@@ -78,7 +69,7 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.eisvogelweg2.de
       - TRUSTED_PROXIES=192.168.90.0/24
     volumes:
-      - nextcloud-www:/var/www/html
+      - /home/eddie/docker-data/nextcloud/www:/var/www/html
       - /media/t1/nextcloud:/var/www/html/data
 
 networks:
