@@ -30,6 +30,8 @@ services:
       ## HTTP Services
       - "traefik.http.routers.eisvogelweg2-rtr.service=eisvogelweg2-svc"
       - "traefik.http.services.eisvogelweg2-svc.loadbalancer.server.port=80"
+      ## Watchtower
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://www.eisvogelweg2.de || exit 1"]
       interval: 1m30s
