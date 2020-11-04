@@ -2,4 +2,5 @@ docker.env
 .env
 acme.json
 traefik-proxy/traefik/acme.json
-traefik-proxy/traefik/acme.json
+
+traefik-v2/mariadb/dbbackup/*
