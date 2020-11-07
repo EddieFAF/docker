@@ -4,3 +4,5 @@ acme.json
 traefik-proxy/traefik/acme.json
 
 traefik-v2/mariadb/dbbackup/*
+
+traefik-v2/guacamole/guac_initdb.sql
