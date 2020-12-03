@@ -14,12 +14,24 @@ services:
       - MYSQL_HOST=clarkson-db
       - MYSQL_USERNAME=clarkson
       - MYSQL_PASSWORD=${CLARKSON_PASSWORD}
-      - ENABLE_REGISTRATIONS=true
+      - ENABLE_REGISTRATIONS=false
     volumes:
       - ${DATADIR}/clarkson/data:/var/www/html
-#      - ${DATADIR}/wordpress/logs/:/www/logs
-    ports:
-      - 3001:3000
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.clarkson-rtr.entrypoints=https"
+      - "traefik.http.routers.clarkson-rtr.rule=Host(`tanken.$DOMAINNAME`)"
+      - "traefik.http.routers.clarkson-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.clarkson-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.clarkson-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.clarkson-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.clarkson-rtr.service=clarkson-svc"
+      - "traefik.http.services.clarkson-svc.loadbalancer.server.port=3000"
+#    ports:
+#      - 3001:3000
     networks:
       - t2_proxy
 

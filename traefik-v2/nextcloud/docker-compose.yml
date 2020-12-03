@@ -1,9 +1,9 @@
 # Create netxcloud network first
 # docker network create nextcloud
 #NOTES:
-#1. certificatesresolvers.myresolver.acme.email=myemail@gmail.com 
+#1. certificatesresolvers.myresolver.acme.email=myemail@gmail.com
 #2. TRUSTED_PROXIES values based on your 'traefik docker network run docker network inspect traefik' to see the network
-#3. remove traefik.http.middlewares.nextcloud.headers.contentSecurityPolicy and  
+#3. remove traefik.http.middlewares.nextcloud.headers.contentSecurityPolicy and
 #traefik.http.middlewares.nextcloud.headers.customFrameOptionsValue if you don't want to allow iframe your domain
 
 
@@ -22,7 +22,7 @@ services:
     - POSTGRES_PASSWORD=password
     - POSTGRES_DB=nextcloud
     volumes:
-    - /home/eddie/docker-data/nextcloud/db:/var/lib/postgresql/data
+    - ${DATADIR}/nextcloud/db:/var/lib/postgresql/data
 
   redis:
     image: redis:latest
@@ -31,7 +31,7 @@ services:
     networks:
       - nextcloud
     volumes:
-      - /home/eddie/docker-data/nextcloud/redis:/var/lib/redis
+      - ${DATADIR}/nextcloud/redis:/var/lib/redis
 
   nextcloud:
     image: nextcloud:stable
@@ -69,8 +69,8 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.eisvogelweg2.de
       - TRUSTED_PROXIES=192.168.90.0/24
     volumes:
-      - /home/eddie/docker-data/nextcloud/www:/var/www/html
-      - /media/t1/nextcloud:/var/www/html/data
+      - ${DATADIR}/nextcloud/www:/var/www/html
+      - /mnt/nasgard/nextcloud:/var/www/html/data
 
 networks:
   t2_proxy:
