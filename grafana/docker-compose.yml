@@ -1,0 +1,50 @@
+---
+version: '2.1'
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: "grafana"
+    #    depends_on:
+    #      influxdb:
+    #        condition: service_healthy
+    environment:
+      GF_RENDERING_SERVER_URL: http://192.168.2.30:8081/render
+      GF_RENDERING_CALLBACK_URL: http://192.168.2.30:3000/
+      GF_LOG_FILTERS: rendering:debug
+      #    network_mode: host
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - ${DATADIR}/grafana:/var/lib/grafana
+    user: "1"
+    labels:
+      - "traefik.enable=false"
+      - "traefik.http.routers.grafana.entrypoints=http"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.eisvogelweg2.de`)"  ## Hier eure Domain eingeben ##
+      - "traefik.http.middlewares.grafana-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.grafana.middlewares=grafana-https-redirect"
+      - "traefik.http.routers.grafana-secure.entrypoints=https"
+      - "traefik.http.routers.grafana-secure.rule=Host(`grafana.eisvogelweg2.de`)" ## Hier eure Domain eingeben ##
+      - "traefik.http.routers.grafana-secure.tls=true"
+      - "traefik.http.routers.grafana-secure.tls.certresolver=http"
+      - "traefik.http.routers.grafana-secure.service=grafana"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.docker.network=t2_proxy"
+      - "traefik.http.routers.grafana-secure.middlewares=middlewares-secure-headers@file"
+    networks:
+      - t2_proxy
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    container_name: "grafana-renderer"
+    depends_on:
+      grafana:
+        condition: service_started
+    ports:
+      - 8081:8081
+
+networks:
+  t2_proxy:
+    external: true
+

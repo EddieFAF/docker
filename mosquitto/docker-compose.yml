@@ -1,0 +1,20 @@
+version: "2.1"
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    volumes:
+      - ${DATADIR}/mosquitto/config:/mosquitto/config
+      - ${DATADIR}/mosquitto/data:/mosquitto/data
+      - ${DATADIR}/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 9001:9001
+    networks:
+      - intern
+    restart: unless-stopped
+
+networks:
+  intern:
+    external: true
+

@@ -1,0 +1,41 @@
+### MariaDB
+### docker-compose.yml
+##Start
+version: '3.7'
+services:
+
+  mariadbmaster:
+    image: tiredofit/mariadb:latest
+    restart: always
+    container_name: mariadbmaster
+    networks:
+      t2_proxy:
+        ipv4_address: 192.168.90.250
+    security_opt:
+      - no-new-privileges:true
+    ports:
+     - 3306:3306
+    environment:
+     - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
+     - DB_NAME=${DB_NAME},guacamole
+     - DB_USER=${DB_USER}
+     - DB_PASS=${DB_PASSWORD}
+     - DB_BACKUP=true
+     - DB_BACKUP_DUMP_FREQ=1440
+     - DB_BACKUP_DUMP_BEGIN=0000
+     - DB_BACKUP_CLEANUP_TIME=8640
+     - DB_BACKUP_MD5=true
+     - DB_BACKUP_COMPRESSION=GZ
+     - DB_BACKUP_SPLIT_DB=false
+
+    volumes:
+     - ${DATADIR}/mariadbmaster/data:/var/lib/mysql
+       #     - ./conf:/etc/mysql/mariadb.conf.d
+     - /etc/timezone:/etc/timezone:ro
+     - /etc/localtime:/etc/localtime:ro
+     - ${DATADIR}/mariadbmaster/dbbackup:/backup
+
+networks:
+  t2_proxy:
+    external: true
+##EOF
