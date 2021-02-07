@@ -2,34 +2,35 @@
 version: "2.2"
 services:
   openhab:
-    image: openhab/openhab:2.5.9
+    image: openhab/openhab:3.0.0
     container_name: openhab
-    ports:
-      - "9080:8080"
-      - "9443:8443"
-      - "9101:8101"
+    #    ports:
+    #      - "9080:8080"
+    #      - "9443:8443"
+    #      - "9101:8101"
     environment:
-      - USER_ID=999
-      - GROUP_ID=998
+      - USER_ID=998
+      - GROUP_ID=997
       - TZ=Europe/Berlin
-      - OPENHAB_HTTP_PORT=8080
-      - OPENHAB_HTTPS_PORT=8443
+      - OPENHAB_HTTP_PORT=9080
+      - OPENHAB_HTTPS_PORT=9443
       - LANG=de_DE.UTF-8
       - LC_ALL=de_DE.UTF-8
       - LANGUAGE=de_DE.UTF-8
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - /home/eddie/docker-data/openhab/conf:/openhab/conf
-      - /home/eddie/docker-data/openhab/userdata:/openhab/userdata
-      - /home/eddie/docker-data/openhab/addons:/openhab/addons
-    restart: always
-    #    network_mode: host
-    networks:
-      - t2_proxy
+      - ${DATADIR}/openhab/conf:/openhab/conf
+      - ${DATADIR}/openhab/userdata:/openhab/userdata
+      - ${DATADIR}/openhab/addons:/openhab/addons
+      - ${DATADIR}/openhab/etc:/etc/openhab
+    restart: unless-stopped
+    network_mode: host
+    #networks:
+    #  - t2_proxy
 
-networks:
-  t2_proxy:
-    external: true
+    #networks:
+    #    t2_proxy:
+    #        external: true
 
 

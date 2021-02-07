@@ -5,7 +5,7 @@ services:
   nginx:
     container_name: www.eisvogelweg2.de
     restart: unless-stopped
-    image: linuxserver/nginx:latest
+    image: ghcr.io/linuxserver/nginx:latest
     volumes:
       - ${DATADIR}/www.eisvogelweg2.de/config:/config
 #    ports:

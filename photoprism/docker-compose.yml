@@ -1,0 +1,56 @@
+version: '2'
+services:
+  photoprism:
+    image: photoprism/photoprism:latest
+    container_name: photoprism
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    ports:
+      - 2342:2342
+    environment:
+      - PHOTOPRISM_HTTP_PORT=2342
+      - PHOTOPRISM_ADMIN_PASSWORD=terror
+      - PHOTOPRISM_DEBUG=false
+      - PHOTOPRISM_PUBLIC=false
+      - PHOTOPRISM_READONLY=false
+      - PHOTOPRISM_EXPERIMENTAL=true
+      - PHOTOPRISM_DISABLE_WEBDAV=false
+      - PHOTOPRISM_DISABLE_SETTINGS=false
+      - PHOTOPRISM_DISABLE_TENSORFLOW=false
+      - PHOTOPRISM_DETECT_NSFW=false
+      - PHOTOPRISM_UPLOAD_NSFW=true
+      - PHOTOPRISM_DATABASE_DRIVER=mysql
+      - PHOTOPRISM_DATABASE_SERVER=mariadb:3306
+      - PHOTOPRISM_DATABASE_NAME=photoprism
+      - PHOTOPRISM_DATABASE_USER=photoprism
+      - PHOTOPRISM_DATABASE_PASSWORD=photoprismpw
+      - PHOTOPRISM_SITE_URL=http://192.168.2.22:2342
+      - PHOTOPRISM_SITE_TITLE=PhotoPrism
+      - PHOTOPRISM_SITE_CAPTION=Browse Your Life
+      - PHOTOPRISM_SITE_DESCRIPTION=Photoprism
+      - PHOTOPRISM_SITE_AUTHOR=Photoprism
+    volumes:
+      - /opt/docker-data/photoprism/originals:/photoprism/originals
+      - /opt/docker-data/photoprism/storage:/photoprism/storage
+      - /opt/docker-data/photoprism/import:/photoprism/import
+      - /opt/docker-data/photoprism/export:/photoprism/export
+      - /opt/docker-data/photoprism/cache:/photoprism/cache
+      - /opt/docker-data/photoprism/config:/photoprism/config
+
+  mariadb:
+    image: mariadb:10.5
+    container_name: photoprism_db
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    command: mysqld --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=50
+    volumes:
+      - /opt/docker-data/photoprism/database:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=photoroot
+      - MYSQL_DATABASE=photoprism
+      - MYSQL_USER=photoprism
+      - MYSQL_PASSWORD=photoprismpw
+

@@ -16,22 +16,23 @@ services:
     image: postgres:11
     container_name: nextcloud-db
     networks:
-      - nextcloud
+      - t2_proxy
     environment:
-    - POSTGRES_USER=nextcloud
-    - POSTGRES_PASSWORD=password
-    - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nextcloud
     volumes:
-    - ${DATADIR}/nextcloud/db:/var/lib/postgresql/data
+      - ${DATADIR}/nextcloud/db:/var/lib/postgresql/data
 
   redis:
     image: redis:latest
     container_name: nextcloud-redis
     restart: always
     networks:
-      - nextcloud
+      - t2_proxy
     volumes:
       - ${DATADIR}/nextcloud/redis:/var/lib/redis
+      - ${DATADIR}/nextcloud/redis/data:/data
 
   nextcloud:
     image: nextcloud:latest
@@ -39,7 +40,6 @@ services:
     restart: always
     networks:
       - t2_proxy
-      - nextcloud
     depends_on:
       - redis
       - db
@@ -59,6 +59,9 @@ services:
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=nextcloud
       - POSTGRES_PASSWORD=password
@@ -69,13 +72,12 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.eisvogelweg2.de
       - TRUSTED_PROXIES=192.168.90.0/24
     volumes:
+        #      - ${DATADIR}/nextcloud/data:/data
+        #      - ${DATADIR}/nextcloud/www:/config
+      - ${DATADIR}/nextcloud/data:/var/www/html/data
       - ${DATADIR}/nextcloud/www:/var/www/html
-      - /media/t1/nextcloud:/var/www/html/data
 
 networks:
   t2_proxy:
-    external: true
-
-  nextcloud:
     external: true
 

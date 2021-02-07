@@ -1,0 +1,18 @@
+---
+version: "2.1"
+services:
+  digikam:
+    image: ghcr.io/linuxserver/digikam
+    container_name: digikam
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - ${DATADIR}/digikam/config:/config
+      - /mnt/nasgard/download/20210105_-_Google_Photos:/config/Pictures
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+

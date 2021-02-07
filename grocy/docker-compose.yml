@@ -1,0 +1,43 @@
+---
+version: "2"
+services:
+  grocy:
+    image: ghcr.io/linuxserver/grocy:latest
+    container_name: grocy
+    networks:
+      - t2_proxy
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - GROCY_DEFAULT_LOCALE=de
+      - GROCY_CURRENCY=EUR
+        #      - GROCY_DISABLE_AUTH=true
+      - GROCY_FEATURE_FLAG_BATTERIES=false
+      - GROCY_FEATURE_FLAG_EQUIPMENT=false
+      - GROCY_FEATURE_FLAG_CHORES=false
+    volumes:
+      - ${DATADIR}/grocy/config:/config
+    ports:
+      - 9283:80
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.grocy-rtr.entrypoints=https"
+      - "traefik.http.routers.grocy-rtr.rule=Host(`grocy.$DOMAINNAME`)"
+      - "traefik.http.routers.grocy-rtr.tls=true"
+   #   - "traefik.http.routers.grocy-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.grocy-rtr.middlewares=chain-no-auth@file" # No Authentication
+   #   - "traefik.http.routers.gocy-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+      # - "traefik.http.routers.grocy-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.grocy-rtr.service=grocy-svc"
+      - "traefik.http.services.grocy-svc.loadbalancer.server.port=80"
+
+
+networks:
+  t2_proxy:
+    external: true
+

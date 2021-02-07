@@ -13,3 +13,6 @@ NGINX as a reverse proxy is used for those projects.
 
 
 Currently it contains these projects:
+- nginx (as webserver)
+- redis
+
