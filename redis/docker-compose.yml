@@ -1,13 +1,13 @@
-version: '3.7'
+version: '3.3'
 services:
-  
+
   redis-app:
     image: tiredofit/redis:latest
     container_name: redis-app
     volumes:
     - ${DATADIR}/redis/data:/data/db
     #- ./logs:/data/logs
-    environment: 
+    environment:
     - ZABBIX_HOSTNAME=redis-app
     - ENABLE_LOGS=FALSE
     - REDIS_PASS=9f1297a5793ed18422d3ec92a0eb23d9d91e68d7524937af6248d0ed6b6d006f
