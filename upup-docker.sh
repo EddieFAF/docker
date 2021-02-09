@@ -1,88 +1,74 @@
 #!/bin/bash
 
+DOCKERDIR=/opt/docker
+
+container_start () {
+    cd $DOCKERDIR/$1/
+    docker-compose -f $DOCKERDIR/$1/docker-compose.yml up -d
+}
+
 ### Bitwarden
-cd /opt/docker/bitwarden/
-docker-compose -f /opt/docker/bitwarden/docker-compose.yml up -d
+container_start bitwarden
 
 ### Clarkson
-cd /opt/docker/clarkson/
-docker-compose -f /opt/docker/clarkson/docker-compose.yml up -d
+container_start clarkson
 
 ### Collabora
-cd /opt/docker/collabora/
-docker-compose -f /opt/docker/collabora/docker-compose.yml up -d
+container_start collabora
 
 ### DIUN
-cd /opt/docker/diun/
-docker-compose -f /opt/docker/diun/docker-compose.yml up -d
+container_start diun
 
 ### FreshRSS
-cd /opt/docker/freshrss/
-docker-compose -f /opt/docker/freshrss/docker-compose.yml up -d
+container_start freshrss
 
 ### Frontail
-cd /opt/docker/frontail/
-docker-compose -f /opt/docker/frontail/docker-compose.yml up -d
+container_start frontail
 
 ### Grafana
-cd /opt/docker/grafana/
-docker-compose -f /opt/docker/grafana/docker-compose.yml up -d
+container_start grafana
 
 ### Grocy
-cd /opt/docker/grocy/
-docker-compose -f /opt/docker/grocy/docker-compose.yml up -d
+container_start grocy
 
 ### InfluxDB
-cd /opt/docker/influxdb/
-docker-compose -f /opt/docker/influxdb/docker-compose.yml up -d
+container_start influxdb
 
 ### Jellyfin
-cd /opt/docker/jellyfin/
-docker-compose -f /opt/docker/jellyfin/docker-compose.yml up -d
+container_start jellyfin
 
 ### Jitsi
-cd /opt/docker/jitsi/
-docker-compose -f /opt/docker/jitsi/docker-compose.yml up -d
+container_start jitsi
 
 ### MariaDB
-cd /opt/docker/mariadb/
-docker-compose -f /opt/docker/mariadb/docker-compose.yml up -d
+container_start mariadb
 
 ### Mosquitto
-cd /opt/docker/mosquitto/
-docker-compose -f /opt/docker/mosquitto/docker-compose.yml up -d
+container_start mosquitto
 
 ### Nextcloud
-cd /opt/docker/nc/
-docker-compose -f /opt/docker/nc/docker-compose.yml up -d
+container_start nc
 
 ### OpenVPN
-cd /opt/docker/openvpn/
-docker-compose -f /opt/docker/openvpn/docker-compose.yml up -d
+container_start openvpn
 
 ### Paperless
-cd /opt/docker/paperless-ng/
-docker-compose -f /opt/docker/paperless-ng/docker-compose.yml up -d
+container_start paperless-ng
 
 ### PHPmyAdmin
-cd /opt/docker/phpmyadmin/
-docker-compose -f /opt/docker/phpmyadmin/docker-compose.yml up -d
+container_start phpmyadmin
 
 ### Portainer
-cd /opt/docker/portainer/
-docker-compose -f /opt/docker/portainer/docker-compose.yml up -d
+container_start portainer
 
 ### Redis
-cd /opt/docker/redis/
-docker-compose -f /opt/docker/redis/docker-compose.yml up -d
+container_start redis
 
 ### Traefik
-cd /opt/docker/traefik/
-docker-compose -f /opt/docker/traefik/docker-compose.yml up -d
+container_start traefik
 
 ### TTrss
-cd /opt/docker/ttrss/
-docker-compose -f /opt/docker/ttrss/docker-compose.yml up -d
+container_start ttrss
 
 ##EOF
 
