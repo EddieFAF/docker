@@ -1,0 +1,43 @@
+version: '3.3'
+services:
+  miniflux:
+    image: miniflux/miniflux:latest
+    container_name: miniflux
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgres://miniflux:secret@db/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=test123
+      - BASE_URL=https://miniflux.eisvogelweg2.de
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.eisvogelweg2.de`)"
+      - "traefik.http.routers.miniflux-rtr.entrypoints=https"
+      - "traefik.http.routers.miniflux-rtr.tls=true"
+      - "traefik.http.routers.miniflux-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
+      - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
+    networks:
+      - t2_proxy
+
+  db:
+    image: postgres:latest
+    container_name: miniflux_postgres
+    environment:
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - /opt/docker-data/miniflux/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "miniflux"]
+      interval: 10s
+    networks:
+      - t2_proxy
+
+networks:
+  t2_proxy:
+    external: true
+
+

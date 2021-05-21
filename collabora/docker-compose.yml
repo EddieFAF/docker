@@ -1,0 +1,34 @@
+version: '3.3'
+services:
+  collabora:
+    image: collabora/code
+    container_name: collabora_app
+    networks:
+      - t2_proxy
+    cap_add:
+      - MKNOD
+    expose:
+      - 9980
+    environment:
+      - domain=nextcloud.eisvogelweg2.de #Gebt hier eure Nextcloud Domain an. Wenn ihr dies nicht nutzt, dann entfernt diese Zeile
+      - username=admin     #Nutzername eingeben
+      - password=terror    #Passwort eingeben
+      - "extra_params=--o:ssl.enable=false --o:ssl.termination=true"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.collabora-rtr.entrypoints=https"
+      - "traefik.http.routers.collabora-rtr.rule=Host(`collabora.eisvogelweg2.de`)"
+      - "traefik.http.routers.collabora-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.collabora-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication                                                                                                  #      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.collabora-rtr.service=collabora-svc"
+      - "traefik.http.services.collabora-svc.loadbalancer.server.port=9980"
+
+networks:
+  t2_proxy:
+    external: true
+

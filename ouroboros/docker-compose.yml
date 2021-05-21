@@ -1,0 +1,22 @@
+version: '3'
+services:
+  ouroboros:
+    container_name: ouroboros
+    hostname: ouroboros
+    image: pyouroboros/ouroboros
+    environment:
+      - CLEANUP=true
+      - INTERVAL=21600
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+      - IGNORE=traefik
+      - TZ=Europe/Berlin
+      - INFLUX_URL=192.168.2.22
+      - INFLUX_PORT=8086
+      - INFLUX_USERNAME=openhabian
+      - INFLUX_PASSWORD=ilikec0derz!
+      - INFLUX_DATABASE=openhab
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+

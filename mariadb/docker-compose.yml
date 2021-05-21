@@ -14,7 +14,7 @@ services:
     security_opt:
       - no-new-privileges:true
     ports:
-     - 3306:3306
+        - 3306:3306
     environment:
      - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
      - DB_HOST=${DB_HOST}

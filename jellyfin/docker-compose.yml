@@ -2,13 +2,14 @@
 version: "2.1"
 services:
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin
+    image: ghcr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
       - UMASK_SET=<022> #optional
+      - JELLYFIN_PublishedServerUrl=192.168.2.22
     volumes:
       - ${DATADIR}/jellyfin:/config
       - /mnt/nasgard/Medien/Serien:/data/tvshows

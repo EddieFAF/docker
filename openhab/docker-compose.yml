@@ -2,7 +2,7 @@
 version: "2.2"
 services:
   openhab:
-    image: openhab/openhab:3.0.0
+    image: openhab/openhab:latest
     container_name: openhab
     #    ports:
     #      - "9080:8080"

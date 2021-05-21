@@ -3,8 +3,10 @@
 DOCKERDIR=/opt/docker
 
 container_start () {
-    cd $DOCKERDIR/$1/
-    docker-compose -f $DOCKERDIR/$1/docker-compose.yml up -d
+    if [ "$( docker container inspect -f '{{.State.Status}}' $1 )" == "running" ]; then
+        cd $DOCKERDIR/$1/
+        docker-compose -f $DOCKERDIR/$1/docker-compose.yml up -d
+    fi
 }
 
 ### Bitwarden
