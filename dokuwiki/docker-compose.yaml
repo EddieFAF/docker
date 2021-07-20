@@ -1,0 +1,38 @@
+---
+version: "2.1"
+services:
+  dokuwiki:
+    image: ghcr.io/linuxserver/dokuwiki
+    container_name: dokuwiki
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATADIR}/dokuwiki/config:/config
+        #    ports:
+        #      - 80:80
+        #      - 443:443 #optional
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dokuwiki-rtr.entrypoints=https"
+      - "traefik.http.routers.dokuwiki-rtr.rule=Host(`wiki.$DOMAINNAME`)"
+      - "traefik.http.routers.dokuwiki-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.dokuwiki-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.bitwarden-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.bitwarden-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.dokuwiki-rtr.service=dokuwiki-svc"
+      - "traefik.http.services.dokuwiki-svc.loadbalancer.server.port=80"
+
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  t2_proxy:
+    external: true
+

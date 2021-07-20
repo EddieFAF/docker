@@ -1,0 +1,63 @@
+version: '2'
+
+services:
+  db:
+    image: mariadb:10.1
+    container_name: seafile-mysql
+#    expose:    # no need to expose port, it's done internally due to depends_on in seafile
+#      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=myrootpassword
+      - MYSQL_LOG_CONSOLE=true
+    volumes:
+      - /opt/docker-data/seafile/db:/var/lib/mysql
+    networks:
+      - seafile-net
+
+  memcached:
+    image: memcached:1.5.6
+    container_name: seafile-memcached
+    entrypoint: memcached -m 256
+    networks:
+      - seafile-net
+
+  seafile:
+    image: seafileltd/seafile-mc:latest
+    container_name: seafile-app
+    volumes:
+      - /opt/docker-data/seafile/seafile-data:/shared
+    environment:
+      - DB_HOST=db
+      - DB_ROOT_PASSWD=myrootpassword
+      - TIME_ZONE=Europe/Berlin
+      - SEAFILE_ADMIN_EMAIL=eddie.faf@googlemail.com
+      - SEAFILE_ADMIN_PASSWORD=terror
+      - SEAFILE_SERVER_LETSENCRYPT=false
+      - SEAFILE_SERVER_HOSTNAME=cloud.eisvogelweg2.de
+      - SEAFILE_SERVER_URL=https://cloud.eisvogelweg2.de
+    depends_on:
+      - db
+      - memcached
+    networks:
+      - seafile-net
+      - t2_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=t2_proxy"
+      - "traefik.http.routers.seafile.entrypoints=https"
+      - "traefik.http.routers.seafile.rule=Host(`cloud.eisvogelweg2.de`)"
+        #      - "traefik.http.routers.seafile.middlewares=chain-no-auth@file"   # calling on secured chain in config.yml
+        #      - "traefik.http.middlewares.sf-rep.redirectregex.permanent=true"
+        #      - "traefik.http.middlewares.sf-header.headers.customFrameOptionsValue=SAMEORIGIN"
+        #      - "traefik.http.routers.seafile-secure.middlewares=sf-rep,sf-header"
+      - "traefik.http.routers.seafile.tls=true"
+      - "traefik.http.routers.seafile.service=seafile-svc"
+      - "traefik.http.services.seafile-svc.loadbalancer.server.port=80"
+#      - "traefik.http.routers.seafile.service=seafile"       # Redirect to https, so no need
+
+networks:
+  t2_proxy:
+    external:
+      name: t2_proxy
+  seafile-net:
+
