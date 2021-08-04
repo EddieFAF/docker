@@ -15,7 +15,7 @@ services:
     ports:
       - 181:80
     environment:
-      - SELF_URL_PATH=http://192.168.2.30:181/ # please change to your own domain
+      - SELF_URL_PATH=http://192.168.2.22:181/ # please change to your own domain
       - DB_HOST=database.postgres
       - DB_PORT=5432
       - DB_NAME=ttrss
@@ -27,10 +27,10 @@ services:
     restart: always
     command: sh -c 'sh /wait-for.sh $$DB_HOST:$$DB_PORT -- php /configure-db.php && exec s6-svscan /etc/s6/'
 
-  service.mercury: # set Mercury Parser API endpoint to `service.mercury:3000` on TTRSS plugin setting page
+  service.mercury: # set Mercury Parser API endpoint to `service.mercury:3001` on TTRSS plugin setting page
     image: wangqiru/mercury-parser-api:latest
     container_name: mercury
     expose:
-      - 3000
+      - 3001
     restart: always
 

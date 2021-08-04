@@ -1,0 +1,38 @@
+---
+version: "2.1"
+services:
+  jellyfin:
+    image: ghcr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=<022> #optional
+      - JELLYFIN_PublishedServerUrl=192.168.2.22
+    volumes:
+      - ${DATADIR}/jellyfin:/config
+      - /mnt/nasgard/Medien/Serien:/data/tvshows
+      - /mnt/nasgard/Medien/Movies:/data/movies
+        #- /opt/vc/lib:/opt/vc/lib #optional
+      - /mnt/nasgard/Medien/_unsorted/Anime/Filme:/data/animemovies
+      - /mnt/nasgard/Medien/_unsorted/Anime/Serien:/data/animeseries
+      - /mnt/nasgard/Medien/_unsorted/Comedy:/data/comedy
+      - /mnt/nasgard/Medien/_unsorted/Adult/Movies:/data/adultmovies
+      - /mnt/nasgard/Medien/_unsorted/Adult/Anime:/data/adultanime
+      - /mnt/nasgard/Medien/Music/Musik:/data/musik
+      - /mnt/nasgard/Medien/Music/Various:/data/variousmusik
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+      - 7359:7359/udp #optional
+        #      - 1900:1900/udp #optional
+        #    devices:
+            #- /dev/dri:/dev/dri #optional
+            #- /dev/vcsm:/dev/vcsm #optional
+            #- /dev/vchiq:/dev/vchiq #optional
+            #- /dev/video10:/dev/video10 #optional
+            #- /dev/video11:/dev/video11 #optional
+            #- /dev/video12:/dev/video12 #optional
+    restart: unless-stopped
+

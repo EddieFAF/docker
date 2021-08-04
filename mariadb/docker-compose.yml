@@ -1,7 +1,7 @@
 ### MariaDB
 ### docker-compose.yml
 ##Start
-version: '3.7'
+version: '3.3'
 services:
 
   mariadbmaster:
@@ -14,9 +14,10 @@ services:
     security_opt:
       - no-new-privileges:true
     ports:
-     - 3306:3306
+        - 3306:3306
     environment:
      - ROOT_PASS=${MYSQL_ROOT_PASSWORD}
+     - DB_HOST=${DB_HOST}
      - DB_NAME=${DB_NAME},guacamole
      - DB_USER=${DB_USER}
      - DB_PASS=${DB_PASSWORD}

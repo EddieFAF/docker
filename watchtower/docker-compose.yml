@@ -4,8 +4,8 @@ services:
 # Watchtower for automatic updates
   watchtower:
     container_name: watchtower
-    restart: always
-    image: v2tec/watchtower
+    restart: unless-stopped
+    image: containrrr/watchtower
     networks:
       - intern
     volumes:
@@ -14,14 +14,16 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_LABEL_ENABLE=true
+        #      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_INTERVALL=600
       - WATCHTOWER_POLL_INTERVALL=600
-        #      - WATCHTOWER_NOTIFICATIONS=email
-        #      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=eddie.faf@gmail.com
-        #      - WATCHTOWER_NOTIFICATION_EMAIL_TO=eddie.faf@gmail.com
-        #      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=smtp.gmail.com
-        #      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=eddie.faf@gmail.com
-        #      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=${WATCHTOWER_MAIL_PASSWORD}
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=eddie.faf@gmail.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=eddie.faf@gmail.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=smtp.gmail.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=eddie.faf@gmail.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=${WATCHTOWER_MAIL_PASSWORD}
+      - WATCHTOWER_NOTIFICATION_URL=telegram://777490832:AAGVDsjef3t06aRWDyYSLipsZWVSMn-HEp0@telegram?channels=8503256
 
 networks:
   intern:

@@ -1,7 +1,7 @@
 version: "3"
 services:
   bitwarden:
-    image: bitwardenrs/server:latest
+    image: vaultwarden/server:latest
     container_name: bitwarden
     restart: unless-stopped
     volumes:
@@ -11,6 +11,8 @@ services:
       - SIGNUPS_ALLOWED=true
       - ADMIN_TOKEN=${ADMIN_TOKEN}
       - LOG_FILE=/data/bitwarden.log
+    ports:
+      - 9284:80
     networks:
       - t2_proxy
     labels:

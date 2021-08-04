@@ -1,0 +1,35 @@
+version: "2"
+services:
+  baikal:
+    image: ckulka/baikal:nginx
+    container_name: baikal
+    restart: always
+    volumes:
+      - /opt/docker-data/baikal/config:/var/www/baikal/config
+      - /opt/docker-data/baikal/Specific:/var/www/baikal/Specific
+    networks:
+      - t2_proxy
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.baikal-rtr.entrypoints=https"
+      - "traefik.http.routers.baikal-rtr.rule=Host(`dav.eisvogelweg2.de`)"
+      - "traefik.http.routers.baikal-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.baikal-rtr.middlewares=chain-no-auth@file,baikal-dav" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.baikal-rtr.service=baikal-svc"
+      - "traefik.http.services.baikal-svc.loadbalancer.server.port=80"
+
+        # Required for iOS, see https://github.com/ckulka/baikal-docker/issues/37
+      - "traefik.http.middlewares.baikal-dav.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.baikal-dav.redirectregex.replacement=https://$$1/dav.php/"
+      - "traefik.http.middlewares.baikal-dav.redirectregex.permanent=true"
+
+
+networks:
+  t2_proxy:
+    external: true
+

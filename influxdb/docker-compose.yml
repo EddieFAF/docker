@@ -15,7 +15,15 @@ services:
     ports:
       - 8083:8083
       - 8086:8086
-    restart: on-failure
+    restart: unless-stopped
     volumes:
-      - ${DATADIR}/influxdb:/var/lib/influxdb
+      - ${DATADIR}/influxdb:/var/lib/influxdb2
+      - ${DATADIR}/influxdb/etc:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=openhabian
+      - DOCKER_INFLUXDB_INIT_PASSWORD=ilikec0derz!
+      - DOCKER_INFLUXDB_INIT_ORG=eisvogelweg2
+      - DOCKER_INFLUXDB_INIT_BUCKET=openhab
+
 

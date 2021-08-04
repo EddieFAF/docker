@@ -3,6 +3,10 @@ services:
   mosquitto:
     image: eclipse-mosquitto
     container_name: mosquitto
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
     volumes:
       - ${DATADIR}/mosquitto/config:/mosquitto/config
       - ${DATADIR}/mosquitto/data:/mosquitto/data
@@ -10,11 +14,27 @@ services:
     ports:
       - 1883:1883
       - 9001:9001
+        #    expose:
+        #      - 1883
+        #      - 9001
     networks:
-      - intern
+      - t2_proxy
     restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+      - "traefik.docker.network=t2_proxy"
+      - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
+      - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.eisvogelweg2.de`)"
+      - "traefik.tcp.routers.mqtt.tls=true"
+      - "traefik.tcp.routers.mqtt.tls.certResolver=default"
+      - "traefik.tcp.routers.mqtt.service=mqtt-svc"
+      - "traefik.tcp.services.mqtt-svc.loadbalancer.server.port=1883"
+        #      - "traefik.tcp.routers.tcpr_mqtt_websocket.entrypoints=websocket"
+        #      - "traefik.tcp.routers.tcpr_mqtt_websocket.rule=HostSNI(`mqtt.eisvogelweg2.de`)"
+        #      - "traefik.tcp.routers.tcpr_mqtt_websocket.service=mqtt_websocket"
+        #      - "traefik.tcp.services.mqtt_websocket.loadbalancer.server.port=9001"
 
 networks:
-  intern:
+  t2_proxy:
     external: true
 

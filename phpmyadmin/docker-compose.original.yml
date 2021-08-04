@@ -1,0 +1,39 @@
+### phpMyAdmin
+### docker-compose.yml
+###
+##START
+version: '3'
+services:
+ phpmyadmin:
+  image: phpmyadmin/phpmyadmin:latest
+  restart: "unless-stopped"
+  container_name: phpmyadmin
+  networks:
+    - t2_proxy
+  ports:
+   - 80
+  environment:
+   PMA_HOST: mariadbmaster
+  labels:
+   - "traefik.enable=true"
+   ## HTTP Routers
+   - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
+   - "traefik.http.routers.phpmyadmin-rtr.rule=Host(`phpmyadmin.$DOMAINNAME`)"
+   - "traefik.http.routers.phpmyadmin-rtr.tls=true"
+#   - "traefik.http.routers.phpmyadmin-rtr.tls.certresolver=dns-cloudflare"
+   ## Middlewares
+#   - "traefik.http.routers.phpmyadmin-rtr.middlewares=chain-no-auth@file" # No Authentication
+#   - "traefik.http.routers.phpmyadmin-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+   - "traefik.http.routers.phpmyadmin-rtr.middlewares=authelia@docker" # Google OAuth 2.0
+   ## HTTP Services
+   - "traefik.http.routers.phpmyadmin-rtr.service=phpmyadmin-svc"
+   - "traefik.http.services.phpmyadmin-svc.loadbalancer.server.port=80"
+  volumes:
+    - ./sessions:/sessions
+  external_links:
+   - mariadbmaster
+networks:
+  t2_proxy:
+    external: true
+##EOF
+

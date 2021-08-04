@@ -1,0 +1,41 @@
+### Adminer
+### docker-compose.yml
+###
+##START
+version: '3'
+services:
+ adminer:
+  image: adminer:latest
+  restart: "unless-stopped"
+  container_name: adminer
+  networks:
+    - t2_proxy
+      #  ports:
+      #   - 80
+  environment:
+   PMA_HOST: mariadbmaster
+   MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+   ADMINER_DEFAULT_SERVER: mariadbmaster
+   ADMINER_DESIGN: 'nette'
+  labels:
+   - "traefik.enable=true"
+   ## HTTP Routers
+   - "traefik.http.routers.adminer-rtr.entrypoints=https"
+   - "traefik.http.routers.adminer-rtr.rule=Host(`adminer.$DOMAINNAME`)"
+   - "traefik.http.routers.adminer-rtr.tls=true"
+#   - "traefik.http.routers.adminer-rtr.tls.certresolver=dns-cloudflare"
+   ## Middlewares
+   #   - "traefik.http.routers.adminer-rtr.middlewares=chain-no-auth@file" # No Authentication
+#   - "traefik.http.routers.adminer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+   - "traefik.http.routers.adminer-rtr.middlewares=authelia@docker" # Authelia
+   ## HTTP Services
+   - "traefik.http.routers.adminer-rtr.service=adminer-svc"
+   - "traefik.http.services.adminer-svc.loadbalancer.server.port=8080"
+
+  external_links:
+   - mariadbmaster
+networks:
+  t2_proxy:
+    external: true
+##EOF
+

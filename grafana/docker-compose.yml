@@ -8,8 +8,8 @@ services:
     #      influxdb:
     #        condition: service_healthy
     environment:
-      GF_RENDERING_SERVER_URL: http://192.168.2.30:8081/render
-      GF_RENDERING_CALLBACK_URL: http://192.168.2.30:3000/
+      GF_RENDERING_SERVER_URL: http://192.168.2.22:8081/render
+      GF_RENDERING_CALLBACK_URL: http://192.168.2.22:3000/
       GF_LOG_FILTERS: rendering:debug
       #    network_mode: host
     ports:
@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DATADIR}/grafana:/var/lib/grafana
-    user: "1"
+    user: "1000"
     labels:
       - "traefik.enable=false"
       - "traefik.http.routers.grafana.entrypoints=http"

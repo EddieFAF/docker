@@ -12,7 +12,7 @@ services:
 #      - JAVA_OPTS=options #optional
     volumes:
       - ${DATADIR}/airsonic/config:/config
-      - /mnt/nasgard/Medien/Music:/music
+      - /mnt/nasgard/Medien/Music/Musik:/music
       - ${DATADIR}/airsonic/playlists:/playlists
       - ${DATADIR}/airsonic/podcasts:/podcasts
       - ${DATADIR}/airsonic/other:/media #optional
@@ -28,9 +28,9 @@ services:
       - "traefik.http.routers.airsonic-rtr.tls=true"
 #      - "traefik.http.routers.airsonic-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
-#      - "traefik.http.routers.airsonic-rtr.middlewares=chain-no-auth@file" # No Authentication
+      - "traefik.http.routers.airsonic-rtr.middlewares=chain-no-auth@file" # No Authentication
 #      - "traefik.http.routers.airsonic-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-      - "traefik.http.routers.airsonic-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+#      - "traefik.http.routers.airsonic-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
       ## HTTP Services
       - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
       - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
