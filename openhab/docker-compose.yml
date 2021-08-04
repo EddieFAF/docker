@@ -2,12 +2,12 @@
 version: "2.2"
 services:
   openhab:
-    image: openhab/openhab:2.5.9
+    image: openhab/openhab:3.0.0
     container_name: openhab
     ports:
-      - "9080:8080"
-      - "9443:8443"
-      - "9101:8101"
+      - "8080:8080"
+      - "8443:8443"
+      - "8101:8101"
     environment:
       - USER_ID=999
       - GROUP_ID=998
@@ -20,16 +20,16 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - /home/eddie/docker-data/openhab/conf:/openhab/conf
-      - /home/eddie/docker-data/openhab/userdata:/openhab/userdata
-      - /home/eddie/docker-data/openhab/addons:/openhab/addons
+      - /opt/openhab/conf:/openhab/conf
+      - /opt/openhab/userdata:/openhab/userdata
+      - /opt/openhab/addons:/openhab/addons
     restart: always
-    #    network_mode: host
-    networks:
-      - t2_proxy
+    network_mode: host
+    #networks:
+    #  - t2_proxy
 
-networks:
-  t2_proxy:
-    external: true
+    #networks:
+    #  t2_proxy:
+    #    external: true
 
 
