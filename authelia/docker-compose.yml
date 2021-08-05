@@ -1,0 +1,33 @@
+version: "3.3"
+
+networks:
+  t2_proxy:
+    external: true
+
+services:
+    # Authelia (Lite) - Self-Hosted Single Sign-On and Two-Factor Authentication
+  authelia:
+    container_name: sso
+    image: authelia/authelia:latest
+    restart: always
+    networks:
+      t2_proxy:
+        ipv4_address: 192.168.90.61
+    ports:
+      - "9091:9091"
+    volumes:
+      - /opt/docker-data/authelia:/config
+    environment:
+      - TZ=Europe/Berlin
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sso-rtr.entrypoints=https"
+      - "traefik.http.routers.sso-rtr.rule=HostHeader(`sso.eisvogelweg2.de`)"
+      - "traefik.http.routers.sso-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.sso-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sso-rtr.service=sso-svc"
+      - "traefik.http.services.sso-svc.loadbalancer.server.port=9091"
+

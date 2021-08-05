@@ -21,20 +21,39 @@ services:
      - DB_NAME=${DB_NAME},guacamole
      - DB_USER=${DB_USER}
      - DB_PASS=${DB_PASSWORD}
-     - DB_BACKUP=true
+     - DB_BACKUP=false
      - DB_BACKUP_DUMP_FREQ=1440
      - DB_BACKUP_DUMP_BEGIN=0000
      - DB_BACKUP_CLEANUP_TIME=8640
      - DB_BACKUP_MD5=true
      - DB_BACKUP_COMPRESSION=GZ
      - DB_BACKUP_SPLIT_DB=false
-
     volumes:
      - ${DATADIR}/mariadbmaster/data:/var/lib/mysql
        #     - ./conf:/etc/mysql/mariadb.conf.d
      - /etc/timezone:/etc/timezone:ro
      - /etc/localtime:/etc/localtime:ro
      - ${DATADIR}/mariadbmaster/dbbackup:/backup
+
+  maria-db-backup:
+    container_name: maria-db-backup
+    image: tiredofit/mariadb-backup
+    links:
+      - mariadbmaster
+    volumes:
+      - ./backups:/backup
+    environment:
+      - DB_SERVER=mariadbmaster
+      - DB_NAME=guacamole
+      - DB_USER=root
+      - DB_PASSWORD="terror"
+      - DB_DUMP_FREQ=1440
+      - DB_DUMP_BEGIN=0000
+      - DB_CLEANUP_TIME=8640
+      - MD5=TRUE
+      - COMPRESSION=GZ
+      - SPLIT_DB=TRUE
+    restart: always
 
 networks:
   t2_proxy:
