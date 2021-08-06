@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  wg-easy:
+    environment:
+      # ⚠️ Required:
+      # Change this to your host's public address
+      - WG_HOST=vpn.${DOMAINNAME}
+
+      # Optional:
+      # - PASSWORD=foobar123
+      - WG_PORT=51820
+      # - WG_DEFAULT_ADDRESS=10.8.0.x
+      - WG_DEFAULT_DNS=192.168.2.35
+
+    image: weejewel/wg-easy
+    container_name: wg-easy
+    volumes:
+      - ${DATADIR}/wireguard/config:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
