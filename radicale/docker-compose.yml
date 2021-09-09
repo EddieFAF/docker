@@ -1,0 +1,59 @@
+# Can be enhanced with additional compose file
+# See also https://docs.docker.com/compose/production/#modify-your-compose-file-for-production
+
+version: '3.7'
+
+services:
+  radicale:
+    image: radicale-extended
+    container_name: radicale
+    init: true
+    #    ports:
+    #      - 5232:5232
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - KILL
+    healthcheck:
+      test: curl -f http://127.0.0.1:5232 || exit 1
+      interval: 30s
+      retries: 3
+    restart: unless-stopped
+    volumes:
+      - ${DATADIR}/radicale/data:/data
+      - ${DATADIR}/radicale/config:/config:ro
+    networks:
+      - t2_proxy
+    environment:
+      - UID=1000
+      - GID=1000
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.radicale-rtr.entrypoints=https"
+      - "traefik.http.routers.radicale-rtr.rule=Host(`dav.eisvogelweg2.de`)"
+      - "traefik.http.routers.radicale-rtr.tls=true"
+      ## Middlewares
+      #      - "traefik.http.routers.radicale-rtr.middlewares=chain-no-auth@file" # No Authentication
+      - "traefik.http.routers.radicale-rtr.middlewares=chain-no-auth@file,radicale-dav" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.radicale-rtr.service=radicale-svc"
+      - "traefik.http.services.radicale-svc.loadbalancer.server.port=5232"
+
+        # Required for iOS, see https://github.com/ckulka/baikal-docker/issues/37
+      - "traefik.http.middlewares.radicale-dav.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.radicale-dav.redirectregex.replacement=https://$$1/dav.php/"
+      - "traefik.http.middlewares.radicale-dav.redirectregex.permanent=true"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+networks:
+  t2_proxy:
+    external: true
+
