@@ -29,9 +29,9 @@ services:
       GUACD_HOSTNAME: guacd
       MYSQL_HOSTNAME: mariadbmaster
       MYSQL_PORT: 3306
-      MYSQL_DATABASE: guacamole
-      MYSQL_USER: guacdb_user
-      MYSQL_PASSWORD: terror
+      MYSQL_DATABASE: ${GUAC_DB_NAME}
+      MYSQL_USER: ${GUAC_DB_USER}
+      MYSQL_PASSWORD: ${GUAC_DB_PASSWORD}
       GUACAMOLE_HOME: /opt/guacamole/home
     labels:
       - "traefik.enable=true"
