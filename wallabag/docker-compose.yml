@@ -1,0 +1,122 @@
+#The administrative user will be wallabag, password is wallabag.  Unfortunately the image author set this statically
+#log in after brining this online and change the name and password to your own to make yourself the administrator
+#also, as the administrator go to internal settings->import and enable redis to allow the asynchronous import workers to function.
+
+version: '3.3'
+services:
+  wallabag:
+    image: wallabag/wallabag:latest
+    container_name: wallabag
+    networks:
+      - t2_proxy
+    restart: unless-stopped
+    environment:
+      - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_ROOT_PASS}
+      - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASS}
+#e.g. donotreply@yourdomain.com
+      - SYMFONY__ENV__FROM_EMAIL=${WALLABAG_EMAIL}
+      - SYMFONY__ENV__DOMAIN_NAME=https://${WALLABAG_DOMAIN}
+      - SYMFONY__ENV__SECRET=${WALLABAG_SECRET}
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+      - SYMFONY__ENV__DATABASE_HOST=wallabag-db
+      - SYMFONY__ENV__DATABASE_PORT=3306
+      - SYMFONY__ENV__DATABASE_NAME=${WALLABAG_DATABASE_NAME}
+      - SYMFONY__ENV__DATABASE_USER=${WALLABAG_DATABASE_USER}
+      - MYSQL_USER=${WALLABAG_DATABASE_USER}
+      - MYSQL_PASSWORD=${WALLABAG_DATABASE_PASS}
+      - SYMFONY__ENV__MAILER_HOST=mail-relay
+      - SYMFONY_ENV=prod
+      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
+      - SYMFONY__ENV__MAILER_USER=
+      - SYMFONY__ENV__MAILER_PASSWORD=
+      - SYMFONY__ENV__REDIS_HOST=wallabag-redis
+      - SYMFONY__ENV__REDIS_PORT=6379
+      - POPULATE_DATABASE=True
+      #setting this should make the labels redirecting http back to https unnecessary, but leaving them in place just in case
+      #Wallabag will honor the X-Forwarded-Proto header from a *TRUSTED* proxy only.
+      - TRUSTED_PROXIES=10.0.0.0/8,192.168.0.0/16
+    expose:
+      - "80"
+    labels:
+      - traefik.enable=true
+      ## HTTP Routers
+      - "traefik.http.routers.wallabag-rtr.entrypoints=https"
+      - "traefik.http.routers.wallabag-rtr.rule=Host(`wallabag.${DOMAINNAME}`)"
+      - "traefik.http.routers.wallabag-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.wallabag-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.wallabag-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.wallabag-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.wallabag-rtr.service=wallabag-svc"
+      - "traefik.http.services.wallabag-svc.loadbalancer.server.port=80"
+      - traefik.docker.network=t2_proxy
+    depends_on:
+      - wallabag-db
+      - wallabag-redis
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://wallabag:80/login > /dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ${DATADIR}/wallabag/images:/var/www/wallabag/web/assets/images
+      - ${DATADIR}/wallabag/data:/var/www/wallabag/data
+      - ${DATADIR}/wallabag/logs:/var/www/wallabag/var/logs
+
+  wallabag-db:
+    image: mariadb:latest
+    container_name: wallabag-db
+    environment:
+#Required
+      - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_PASS}
+      - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASS}
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+      - SYMFONY__ENV__DATABASE_HOST=wallabag-db
+      - SYMFONY__ENV__DATABASE_PORT=3306
+      - SYMFONY__ENV__DATABASE_NAME=${WALLABAG_DATABASE_NAME}
+      - SYMFONY__ENV__DATABASE_USER=${WALLABAG_DATABASE_USER}
+      - MYSQL_USER=${WALLABAG_DATABASE_USER}
+      - MYSQL_PASSWORD=${WALLABAG_DATABASE_PASS}
+      - MYSQL_DATABASE=${WALLABAG_DATABASE_NAME}
+      - SYMFONY__ENV__MAILER_HOST=mail-relay
+      - SYMFONY_ENV=prod
+      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
+      - SYMFONY__ENV__MAILER_USER=
+      - SYMFONY__ENV__MAILER_PASSWORD=
+      - SYMFONY__ENV__REDIS_HOST=wallabag-redis
+      - SYMFONY__ENV__REDIS_PORT=6379
+      - POPULATE_DATABASE=True
+    volumes:
+      - ${DATADIR}/wallabag/db:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    expose:
+      - "3306"
+    labels:
+      - traefik.enable=false
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin -u $$MYSQL_USER --password=$$MYSQL_PASSWORD ping || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  wallabag-redis:
+    restart: unless-stopped
+    container_name: wallabag-redis
+    image: redis:latest
+    networks:
+      - t2_proxy
+    labels:
+      - traefik.enable=false
+    volumes:
+      - ${DATADIR}/wallabag/redis:/data
+    expose:
+      - "6379"
+
+networks:
+  t2_proxy:
+    external: true
+
+
