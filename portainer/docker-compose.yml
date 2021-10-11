@@ -16,6 +16,8 @@ services:
       - ${DATADIR}/portainer/data:/data
     environment:
       - TZ=$TZ
+    ports:
+      - "9000:9000"
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

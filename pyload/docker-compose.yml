@@ -1,0 +1,23 @@
+---
+version: "2.1"
+services:
+  pyload:
+    image: ghcr.io/linuxserver/pyload:ng
+    container_name: pyload
+    environment:
+      - PUID=1000
+      - PGID=998
+      - TZ=Europe/Berlin
+    volumes:
+      - ./config:/config
+      - /mnt/nasgard/download:/downloads
+    ports:
+      - 8089:8000
+      - 7227:7227 #optional
+    labels:
+      - flame.type=application # "app" works too
+      - flame.name=pyLoad
+      - flame.url=https://192.168.2.22:8089
+      - flame.icon=icon-name # Optional, default is "docker"
+    restart: unless-stopped
+

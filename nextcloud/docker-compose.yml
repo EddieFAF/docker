@@ -10,7 +10,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - ${DATADIR}/nextcloud/database:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${NC_MYSQL_ROOT_PASSORD} #SQL root Passwort eingeben
+      - MYSQL_ROOT_PASSWORD=${NC_MYSQL_ROOT_PASSWORD} #SQL root Passwort eingeben
       - MYSQL_PASSWORD=${NC_MYSQL_PASSWORD} #SQL Benutzer Passwort eingeben
       - MYSQL_DATABASE=${NC_MYSQL_DATABASE} #Datenbank Name
       - MYSQL_USER=${NC_MYSQL_USER} #SQL Nutzername
@@ -26,8 +26,8 @@ services:
         - default
     restart: unless-stopped
     volumes:
-        - /opt/docker-data/nc/redis:/data
-    command: redis-server --requirepass test # Redis Passwort eingeben
+        - ${DATADIR}/nextcloud/redis:/data
+    command: redis-server --requirepass nexttest # Redis Passwort eingeben
 
   nextcloud-app:
     image: nextcloud
@@ -38,13 +38,14 @@ services:
       - nextcloud-db
     environment:
         REDIS_HOST: nextcloud-redis
-        REDIS_HOST_PASSWORD: test # Redis Passwort von oben wieder eingeben
+        REDIS_HOST_PASSWORD: nexttest # Redis Passwort von oben wieder eingeben
         NEXTCLOUD_TRUSTED_DOMAINS: nextcloud.${DOMAINNAME}
         TRUSTED_PROXIES: 192.168.90.0/24
     volumes:
       - ${DATADIR}/nextcloud/app:/var/www/html
       - ${DATADIR}/nextcloud/daten:/var/www/html/data
       - ${DATADIR}/nextcloud/daten/external:/var/www/html/data/external
+      - /home/eddie/Import:/var/www/html/data/import # Import Folder
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.nextcloud.middlewares=nextcloud,nextcloud-caldav

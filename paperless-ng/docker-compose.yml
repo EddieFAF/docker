@@ -1,30 +1,66 @@
+# docker-compose file for running paperless from the Docker Hub.
+# This file contains everything paperless needs to run.
+# Paperless supports amd64, arm and arm64 hardware.
+#
+# All compose files of paperless configure paperless in the following way:
+#
+# - Paperless is (re)started on system boot, if it was running before shutdown.
+# - Docker volumes for storing data are managed by Docker.
+# - Folders for importing and exporting files are created in the same directory
+#   as this file and mounted to the correct folders inside the container.
+# - Paperless listens on port 8000.
+#
+# In addition to that, this docker-compose file adds the following optional
+# configurations:
+#
+# - Instead of SQLite (default), PostgreSQL is used as the database server.
+# - Apache Tika and Gotenberg servers are started with paperless and paperless
+#   is configured to use these services. These provide support for consuming
+#   Office documents (Word, Excel, Power Point and their LibreOffice counter-
+#   parts.
+#
+# To install and update paperless with this file, do the following:
+#
+# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
+#   and '.env' into a folder.
+# - Run 'docker-compose pull'.
+# - Run 'docker-compose run --rm webserver createsuperuser' to create a user.
+# - Run 'docker-compose up -d'.
+#
+# For more extensive installation and update instructions, refer to the
+# documentation.
+
 version: "3.4"
 services:
   broker:
     image: redis:6.0
     container_name: paperless-redis
-    volumes:
-      - ./redis:/data
-    restart: always
+    restart: unless-stopped
+    networks:
+      - intern
 
   db:
     image: postgres:13
     container_name: paperless-postgres
-    restart: always
+    restart: unless-stopped
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ${DATADIR}/paperless/pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
+    networks:
+      - intern
 
   webserver:
     image: jonaswinkler/paperless-ng:latest
-    container_name: paperless-ng
-    restart: always
+    container_name: paperless-app
+    restart: unless-stopped
     depends_on:
       - db
       - broker
+      - gotenberg
+      - tika
     ports:
       - 8100:8000
     healthcheck:
@@ -33,13 +69,56 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - ./data:/usr/src/paperless/data
-      - ./media:/usr/src/paperless/media
+      - ${DATADIR}/paperless/data:/usr/src/paperless/data
+      - ${DATADIR}/paperless/media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - /mnt/nasgard/Import/paperless:/usr/src/paperless/consume
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{created} {title}"
+      PAPERLESS_ALLOWED_HOSTS: eisvogelweg2.de,paperless.eisvogelweg2.de,localhost
+      PAPERLESS_CORS_ALLOWED_HOSTS: http://paperless.eisvogelweg2.de,http://localhost:8000
+    networks:
+      - intern
+      - t2_proxy
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.paperless-rtr.entrypoints=https"
+      - "traefik.http.routers.paperless-rtr.rule=Host(`paperless.$DOMAINNAME`)"
+      - "traefik.http.routers.paperless-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.paperless-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.paperless-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.paperless-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.paperless-rtr.service=paperless-svc"
+      - "traefik.http.services.paperless-svc.loadbalancer.server.port=8000"
+      - "com.centurylinklabs.watchtower.enable=false"
 
+  gotenberg:
+    image: thecodingmachine/gotenberg
+    container_name: paperless-gotenberg
+    restart: unless-stopped
+    environment:
+      DISABLE_GOOGLE_CHROME: 1
+    networks:
+      - intern
 
+  tika:
+    image: apache/tika
+    container_name: paperless-tika
+    restart: unless-stopped
+    networks:
+      - intern
+
+networks:
+  t2_proxy:
+    external: true
+  intern:
+    external: true

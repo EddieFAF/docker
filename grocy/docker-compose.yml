@@ -16,11 +16,12 @@ services:
         #      - GROCY_DISABLE_AUTH=true
       - GROCY_FEATURE_FLAG_BATTERIES=false
       - GROCY_FEATURE_FLAG_EQUIPMENT=false
-      - GROCY_FEATURE_FLAG_CHORES=false
+      - GROCY_FEATURE_FLAG_CHORES=true
     volumes:
       - ${DATADIR}/grocy/config:/config
     ports:
       - 9283:80
+      - 9192:9192
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

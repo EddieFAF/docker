@@ -18,6 +18,7 @@ services:
     networks:
       - t2_proxy
     labels:
+      - "com.centurylinklabs.watchtower.enable=false"
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.honkhausen-rtr.entrypoints=https"

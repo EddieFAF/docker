@@ -27,7 +27,7 @@ services:
    ## Middlewares
    #   - "traefik.http.routers.adminer-rtr.middlewares=chain-no-auth@file" # No Authentication
 #   - "traefik.http.routers.adminer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-   - "traefik.http.routers.adminer-rtr.middlewares=authelia@docker" # Authelia
+   - "traefik.http.routers.adminer-rtr.middlewares=chain-authelia@file" # Authelia
    ## HTTP Services
    - "traefik.http.routers.adminer-rtr.service=adminer-svc"
    - "traefik.http.services.adminer-svc.loadbalancer.server.port=8080"
