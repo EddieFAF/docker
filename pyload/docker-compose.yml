@@ -2,7 +2,7 @@
 version: "2.1"
 services:
   pyload:
-    image: ghcr.io/linuxserver/pyload:ng
+    image: ghcr.io/linuxserver/pyload:latest
     container_name: pyload
     environment:
       - PUID=1000
@@ -14,10 +14,29 @@ services:
     ports:
       - 8089:8000
       - 7227:7227 #optional
+    networks:
+      - t2_proxy
     labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.pyload-rtr.entrypoints=https"
+      - "traefik.http.routers.pyload-rtr.rule=Host(`pyload.eisvogelweg2.de`)"
+      - "traefik.http.routers.pyload-rtr.tls=true"
+      ## Middlewares
+#      - "traefik.http.routers.coder-rtr.middlewares=chain-no-auth@file" # No Authentication
+      - "traefik.http.routers.pyload-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.pyload-rtr.service=pyload-svc"
+      - "traefik.http.services.pyload-svc.loadbalancer.server.port=8000"
       - flame.type=application # "app" works too
       - flame.name=pyLoad
       - flame.url=https://192.168.2.22:8089
       - flame.icon=icon-name # Optional, default is "docker"
     restart: unless-stopped
+
+networks:
+  t2_proxy:
+    external: true
 

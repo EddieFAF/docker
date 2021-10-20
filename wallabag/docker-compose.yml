@@ -11,7 +11,7 @@ services:
       - t2_proxy
     restart: unless-stopped
     environment:
-      - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_ROOT_PASS}
+      - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_PASS}
       - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASS}
 #e.g. donotreply@yourdomain.com
       - SYMFONY__ENV__FROM_EMAIL=${WALLABAG_EMAIL}
