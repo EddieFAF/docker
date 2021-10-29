@@ -30,6 +30,10 @@ services:
       - "traefik.http.services.bitwarden-svc.loadbalancer.server.port=80"
 
       - "com.centurylinklabs.watchtower.enable=true"
+      - flame.type=application # "app" works too
+      - flame.name=bitwarden
+      - flame.url=https://bitwarden.eisvogelweg2.de
+      - flame.icon=bitwarden # Optional, default is "docker"
 
 networks:
   t2_proxy:

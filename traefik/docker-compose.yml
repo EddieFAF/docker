@@ -193,6 +193,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
       - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+      - flame.type=application # "app" works too
+      - flame.name=Dozzle
+      - flame.url=https://dozzle.eisvogelweg2.de
+      - flame.icon=docker # Optional, default is "docker"
 
 
 # DDNS updates at Cloudflare
