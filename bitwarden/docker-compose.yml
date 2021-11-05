@@ -33,7 +33,7 @@ services:
       - flame.type=application # "app" works too
       - flame.name=bitwarden
       - flame.url=https://bitwarden.eisvogelweg2.de
-      - flame.icon=bitwarden # Optional, default is "docker"
+      - flame.icon=bitwarden.png # Optional, default is "docker"
 
 networks:
   t2_proxy:

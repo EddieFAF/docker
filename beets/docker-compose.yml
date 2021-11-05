@@ -12,6 +12,11 @@ services:
       - /opt/docker-data/beets/config:/config
       - /opt/docker-data/beets/library:/music
       - /opt/docker-data/beets/ingest:/downloads
+    labels:
+      - flame.type=application # "app" works too
+      - flame.name=beets
+      - flame.url=https://192.168.2.22:8337
+      - flame.icon=beets.png
     ports:
       - 8337:8337
     restart: unless-stopped

@@ -99,7 +99,11 @@ services:
       ## HTTP Services
       - "traefik.http.routers.paperless-rtr.service=paperless-svc"
       - "traefik.http.services.paperless-svc.loadbalancer.server.port=8000"
-      - "com.centurylinklabs.watchtower.enable=false"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - flame.type=application # "app" works too
+      - flame.name=paperless-ng
+      - flame.url=https://paperless.eisvogelweg2.de
+      - flame.icon=paperless-ng.png # Optional, default is "docker"
 
   gotenberg:
     image: thecodingmachine/gotenberg

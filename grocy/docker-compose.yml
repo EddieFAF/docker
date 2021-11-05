@@ -36,6 +36,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.grocy-rtr.service=grocy-svc"
       - "traefik.http.services.grocy-svc.loadbalancer.server.port=80"
+      - flame.type=application # "app" works too
+      - flame.name=grocy
+      - flame.url=https://grocy.eisvogelweg2.de
+      - flame.icon=grocy.png # Optional, default is "docker"
 
 
 networks:

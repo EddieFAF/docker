@@ -33,7 +33,7 @@ services:
       - flame.type=application # "app" works too
       - flame.name=pyLoad
       - flame.url=https://192.168.2.22:8089
-      - flame.icon=icon-name # Optional, default is "docker"
+      - flame.icon=pyload.png # Optional, default is "docker"
     restart: unless-stopped
 
 networks:

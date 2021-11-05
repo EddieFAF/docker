@@ -114,6 +114,10 @@ services:
       - "traefik.http.middlewares.traefik-headers.headers.referrerpolicy=same-origin"
       - "traefik.http.middlewares.traefik-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
       - "traefik.http.middlewares.traefik-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      - flame.type=application # "app" works too
+      - flame.name=traefik
+      - flame.url=https://traefik.eisvogelweg2.de
+      - flame.icon=traefik.png # Optional, default is "docker"
 
 # Google OAuth - Single Sign On using OAuth 2.0
   oauth:
@@ -196,7 +200,7 @@ services:
       - flame.type=application # "app" works too
       - flame.name=Dozzle
       - flame.url=https://dozzle.eisvogelweg2.de
-      - flame.icon=docker # Optional, default is "docker"
+      - flame.icon=dozzle.png # Optional, default is "docker"
 
 
 # DDNS updates at Cloudflare

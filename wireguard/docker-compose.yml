@@ -16,6 +16,11 @@ services:
     container_name: wg-easy
     volumes:
       - ${DATADIR}/wireguard/config:/etc/wireguard
+    labels:
+      - flame.type=application # "app" works too
+      - flame.name=wireguard
+      - flame.url=https://vpn.eisvogelweg2.de
+      - flame.icon=wireguard.png # Optional, default is "docker"
     ports:
       - "51820:51820/udp"
       - "51821:51821/tcp"

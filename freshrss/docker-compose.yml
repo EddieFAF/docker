@@ -27,7 +27,7 @@ services:
       - flame.type=application # "app" works too
       - flame.name=freshrss
       - flame.url=https://freshrss.eisvogelweg2.de
-      - flame.icon=rss # Optional, default is "docker"
+      - flame.icon=freshrss.png # Optional, default is "docker"
     networks:
       - t2_proxy
 

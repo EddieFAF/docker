@@ -35,6 +35,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
       - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+      - flame.type=application # "app" works too
+      - flame.name=airsonic
+      - flame.url=https://airsonic.eisvogelweg2.de
+      - flame.icon=airsonic.png
 
 networks:
   t2_proxy:

@@ -22,6 +22,11 @@ services:
       - /mnt/nasgard/Medien/_unsorted/Adult/Anime:/data/adultanime
       - /mnt/nasgard/Medien/Music/Musik:/data/musik
       - /mnt/nasgard/Medien/Music/Various:/data/variousmusik
+    labels:
+      - flame.type=application # "app" works too
+      - flame.name=jellyfin
+      - flame.url=https://192.168.2.22:8096
+      - flame.icon=jellyfin.png
     ports:
       - 8096:8096
       - 8920:8920 #optional

@@ -37,6 +37,10 @@ services:
       - "traefik.http.services.coder-svc.loadbalancer.server.port=8080"
 
       - "com.centurylinklabs.watchtower.enable=true"
+      - flame.type=application # "app" works too
+      - flame.name=coder
+      - flame.url=https://coder.eisvogelweg2.de
+      - flame.icon=codeserver.png # Optional, default is "docker"
 #    ports:
 #      - 8443:8443
     restart: unless-stopped
