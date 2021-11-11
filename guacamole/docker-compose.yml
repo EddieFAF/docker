@@ -24,7 +24,7 @@ services:
 #      - "$GUACAMOLE_PORT:8080"
     volumes:
       - ${DATADIR}/guacamole/home:/opt/guacamole/home
-        #      - "/home/eddie/.local/share/fonts/NerdFonts/Hack Regular Nerd Font Complete.ttf:/usr/share/fonts/Hack-Regular.ttf"
+      - "/home/eddie/.local/share/fonts/NerdFonts:/usr/local/share/fonts/Nerdfonts/"
     environment:
       GUACD_HOSTNAME: guacd
       MYSQL_HOSTNAME: mariadbmaster
