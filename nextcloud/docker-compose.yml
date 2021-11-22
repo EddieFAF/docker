@@ -30,7 +30,7 @@ services:
     command: redis-server --requirepass nexttest # Redis Passwort eingeben
 
   nextcloud-app:
-    image: nextcloud
+    image: nextcloud:latest
     container_name: nextcloud-app
     restart: unless-stopped
     depends_on:

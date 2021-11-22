@@ -10,8 +10,9 @@ services:
       - DB_PASS=ttrss # use the same password defined in `database.postgres`
       - PUID=${PUID}
       - PGID=${PGID}
+      - ENABLE_PLUGINS=wallabag_v2, auth_internal
     volumes:
-      - feed-icons:/var/www/feed-icons/
+      - ${DATADIR}/ttrss/feed-icons:/var/www/feed-icons/
     networks:
       - t2_proxy
       - service_only
@@ -64,18 +65,6 @@ services:
       - database_only
     restart: always
 
-  # utility.watchtower:
-  #   container_name: watchtower
-  #   image: containrrr/watchtower:latest
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   environment:
-  #     - WATCHTOWER_CLEANUP=true
-  #     - WATCHTOWER_POLL_INTERVAL=86400
-  #   restart: always
-
-volumes:
-  feed-icons:
 
 networks:
   service_only: # Provide the communication network between services only
