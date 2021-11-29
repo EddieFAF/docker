@@ -34,7 +34,7 @@ services:
       - flame.type=application # "app" works too
       - flame.name=ttrss
       - flame.url=https://rss.eisvogelweg2.de
-      - flame.icon=ttrss.png # Optional, default is "docker"
+      - flame.icon=tinytinyrss.png # Optional, default is "docker"
 
 
   service.mercury: # set Mercury Parser API endpoint to `service.mercury:3000` on TTRSS plugin setting page

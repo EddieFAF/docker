@@ -80,7 +80,7 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-      PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{created} {title}"
+      PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{document_type}/{created_year}{created_month}{created_day} - {title}, {tag_list}"
       PAPERLESS_ALLOWED_HOSTS: eisvogelweg2.de,paperless.eisvogelweg2.de,localhost
       PAPERLESS_CORS_ALLOWED_HOSTS: http://paperless.eisvogelweg2.de,http://localhost:8000
     networks:

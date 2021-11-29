@@ -13,6 +13,7 @@ services:
       - /home/eddie/docker/homeassistant/config:/home/coder/project/hass
       - /opt/docker-data/www.honkhausen.de/config/www:/home/coder/project/honkhausen
       - /opt/docker-data/wordpress/app/wp-content:/home/coder/project/wordpress
+      - /mnt/nasgard/Projekte:/home/coder/project/Projekte
       - .config:/home/coder/.config
       - .local:/home/coder/.local
     environment:
