@@ -35,9 +35,8 @@ services:
       - flame.name=adminer
       - flame.url=https://adminer.eisvogelweg2.de
       - flame.icon=adminer.png
-
-  external_links:
-    - mariadbmaster
+    external_links:
+      - mariadbmaster
 networks:
   t2_proxy:
     external: true
