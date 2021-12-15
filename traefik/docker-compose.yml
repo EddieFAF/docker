@@ -12,6 +12,8 @@ services:
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=true
       - --entryPoints.http.address=:80
+      - --entryPoints.http.http.redirections.entryPoint.to=https
+      - --entryPoints.http.http.redirections.entryPoint.scheme=https
       - --entryPoints.https.address=:443
         # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
       - --entrypoints.https.forwardedHeaders.trustedIPs=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/12,172.64.0.0/13,131.0.72.0/22
@@ -22,7 +24,8 @@ services:
 #      - --api.insecure=true
 #      - --serversTransport.insecureSkipVerify=true
       - --log=true
-      - --log.level=DEBUG # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.format=json
       - --accessLog=true
       - --accessLog.filePath=/traefik.log
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines

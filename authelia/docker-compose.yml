@@ -23,7 +23,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.sso-rtr.entrypoints=https"
-      - "traefik.http.routers.sso-rtr.rule=HostHeader(`sso.eisvogelweg2.de`)"
+      - "traefik.http.routers.sso-rtr.rule=Host(`sso.eisvogelweg2.de`)"
       - "traefik.http.routers.sso-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.sso-rtr.middlewares=chain-authelia@file"
