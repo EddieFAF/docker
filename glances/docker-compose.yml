@@ -1,0 +1,16 @@
+version: "3.5"
+services:
+  glances:
+    image: nicolargo/glances
+    container_name: glances
+    restart: always
+    network_mode: host
+    privileged: true
+    pid: host
+    volumes:
+      - ${DATADIR}/glances/config:/glances/conf
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=${TZ}
+      - "GLANCES_OPT=-w"
+

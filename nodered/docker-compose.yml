@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+# Node-RED
+  nodered:
+    container_name: nodered
+    image: nodered/node-red
+    ports:
+      - "1880:1880"
+      - "1980:1980"
+      - "1401:1400"
+    volumes:
+      # Local path where all Node-RED config will be stored.
+      - ${DATADIR}/nodered/data:/data
+    networks:
+      - t2_proxy
+    environment:
+      TZ: ${TZ}
+    user: "1000:1000"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.nodered-rtr.entrypoints=https"
+      - "traefik.http.routers.nodered-rtr.rule=Host(`nodered.$DOMAINNAME`)"
+      - "traefik.http.routers.nodered-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.nodered-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.nodered-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.nodered-rtr.service=nodered-svc"
+      - "traefik.http.services.nodered-svc.loadbalancer.server.port=1880"
+
+      - "com.centurylinklabs.watchtower.enable=true"
+      - flame.type=application # "app" works too
+      - flame.name=nodered
+      - flame.url=https://nodered.eisvogelweg2.de
+      - flame.icon=nodered.png # Optional, default is "docker"
+
+networks:
+  t2_proxy:
+    external: true
+
+
+

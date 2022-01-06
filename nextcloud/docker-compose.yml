@@ -49,7 +49,7 @@ services:
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.nextcloud.middlewares=nextcloud,nextcloud-caldav
-      - traefik.http.routers.nextcloud.tls.certresolver=default
+        #      - traefik.http.routers.nextcloud.tls.certresolver=le
       - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAINNAME}`)
       - traefik.http.middlewares.nextcloud.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.nextcloud.headers.contentSecurityPolicy=frame-ancestors 'self' ${DOMAINNAME} *.${DOMAINNAME}

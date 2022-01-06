@@ -1,0 +1,33 @@
+version: '2.1'
+services:
+  hammond:
+    image: akhilrex/hammond
+    container_name: hammond
+    volumes:
+      - ${DATADIR}/hammond/config:/config
+      - ${DATADIR}/hammond/data:/assets
+        #    ports:
+        #      - 3000:3000
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.hammond-rtr.entrypoints=https"
+      - "traefik.http.routers.hammond-rtr.rule=Host(`tanken.eisvogelweg2.de`)"
+      - "traefik.http.routers.hammond-rtr.tls=true"
+      ## Middlewares
+#      - "traefik.http.routers.coder-rtr.middlewares=chain-no-auth@file" # No Authentication
+      - "traefik.http.routers.hammond-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.hammond-rtr.service=hammond-svc"
+      - "traefik.http.services.hammond-svc.loadbalancer.server.port=3000"
+    networks:
+      - t2_proxy
+
+networks:
+  t2_proxy:
+    external: true
+
+
