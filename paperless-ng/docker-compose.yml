@@ -38,8 +38,10 @@ services:
     restart: unless-stopped
     networks:
       - intern
+    volumes:
+      - ${DATADIR}/paperless/redis/data:/data
 
-  db:
+  paperless-db:
     image: postgres:13
     container_name: paperless-postgres
     restart: unless-stopped
@@ -53,11 +55,11 @@ services:
       - intern
 
   webserver:
-    image: jonaswinkler/paperless-ng:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
     container_name: paperless-app
     restart: unless-stopped
     depends_on:
-      - db
+      - paperless-db
       - broker
       - gotenberg
       - tika
@@ -76,7 +78,7 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBHOST: db
+      PAPERLESS_DBHOST: paperless-db
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
@@ -106,11 +108,12 @@ services:
       - flame.icon=paperless-ng.png # Optional, default is "docker"
 
   gotenberg:
-    image: thecodingmachine/gotenberg
+    image: gotenberg/gotenberg:7
     container_name: paperless-gotenberg
     restart: unless-stopped
     environment:
       DISABLE_GOOGLE_CHROME: 1
+      CHROMIUM_DISABLE_ROUTES: 1
     networks:
       - intern
 
@@ -126,3 +129,4 @@ networks:
     external: true
   intern:
     external: true
+

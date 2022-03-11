@@ -9,6 +9,7 @@ services:
       - "1880:1880"
       - "1980:1980"
       - "1401:1400"
+      - "3456:3456"
     volumes:
       # Local path where all Node-RED config will be stored.
       - ${DATADIR}/nodered/data:/data
@@ -25,9 +26,10 @@ services:
       - "traefik.http.routers.nodered-rtr.rule=Host(`nodered.$DOMAINNAME`)"
       - "traefik.http.routers.nodered-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file" # No Authentication
 #      - "traefik.http.routers.nodered-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
 #      - "traefik.http.routers.nodered-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      - "traefik.http.routers.nodered-rtr.middlewares=chain-authelia@file" # Authelia Authentication
       ## HTTP Services
       - "traefik.http.routers.nodered-rtr.service=nodered-svc"
       - "traefik.http.services.nodered-svc.loadbalancer.server.port=1880"

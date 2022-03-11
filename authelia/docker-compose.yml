@@ -1,13 +1,10 @@
 version: "3.3"
 
-networks:
-  t2_proxy:
-    external: true
 
 services:
     # Authelia (Lite) - Self-Hosted Single Sign-On and Two-Factor Authentication
   authelia:
-    container_name: sso
+    container_name: authelia
     image: authelia/authelia:latest
     restart: always
     networks:
@@ -15,19 +12,133 @@ services:
         ipv4_address: 192.168.90.61
     ports:
       - "9091:9091"
+    links:
+      - openldap
+    depends_on:
+      - authelia_redis
+        #      - authelia_mysql
     volumes:
-      - /opt/docker-data/authelia:/config
+      - ${DATADIR}/authelia/config.yml:/config/configuration.yml:ro
     environment:
-      - TZ=Europe/Berlin
+      - TZ=${TZ}
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.sso-rtr.entrypoints=https"
-      - "traefik.http.routers.sso-rtr.rule=Host(`sso.eisvogelweg2.de`)"
-      - "traefik.http.routers.sso-rtr.tls=true"
+      - "traefik.http.routers.auth-rtr.entrypoints=https"
+      - "traefik.http.routers.auth-rtr.rule=Host(`auth.eisvogelweg2.de`)"
+      - "traefik.http.routers.auth-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.sso-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.middlewares.authelia-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.authelia-headers.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.authelia-headers.headers.customResponseHeaders.Cache-Control=no-store"
+      - "traefik.http.middlewares.authelia-headers.headers.customResponseHeaders.Pragma=no-cache"
+      - "traefik.http.routers.auth-rtr.middlewares=authelia-headers,chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.sso-rtr.service=sso-svc"
-      - "traefik.http.services.sso-svc.loadbalancer.server.port=9091"
+      - "traefik.http.routers.auth-rtr.service=auth-svc"
+      - "traefik.http.services.auth-svc.loadbalancer.server.port=9091"
 
+        #  authelia_mysql:
+        #    image: linuxserver/mariadb
+        #    container_name: mariadb
+        #    environment:
+        #      - PUID=${PUID}
+        #      - PGID=${PGID}
+        #      - MYSQL_ROOT_PASSWORD=autheliaworld
+        #      - TZ=${TZ}
+        #      - MYSQL_DATABASE=authelia
+        #      - MYSQL_USER=authelia
+        #      - MYSQL_PASSWORD=autheliaworld
+        #    volumes:
+        #      - ${DATADIR}/authelia/database:/config
+        #    expose:
+        #      - 3306
+        #    networks:
+        #      - t2_proxy
+
+  authelia_redis:
+    image: redis
+    container_name: redis
+    expose:
+      - 6379
+    networks:
+      - t2_proxy
+
+  openldap:
+    image: osixia/openldap
+    container_name: openldap
+    command:
+      - "--copy-service"
+      - "--loglevel=debug"
+    networks:
+      - t2_proxy
+    volumes:
+      - ${DATADIR}/openldap/custom_config:/container/service/slapd/assets/config/bootstrap/ldif/custom
+      - ${DATADIR}/openldap/lib/:/var/lib/ldap
+      - ${DATADIR}/openldap/etc/:/etc/ldap/slapd.d
+    environment:
+      - LDAP_LOG_LEVEL=256
+      - LDAP_ORGANISATION=${LDAP_ORGANISATION}
+      - LDAP_DOMAIN=${LDAP_DOMAIN}
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
+      - LDAP_CONFIG_PASSWORD=helloworld
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=readonly
+      - LDAP_READONLY_USER_PASSWORD=readonly
+      - LDAP_ADDITIONAL_MODULES=memberof
+      - LDAP_ADDITIONAL_SCHEMAS=openldap
+      - LDAP_TLS=false
+      - LDAP_TLS_VERIFY_CLIENT=false
+
+  lam:
+    image: jacksgt/ldap-account-manager
+    container_name: lam
+    networks:
+    - t2_proxy
+    volumes:
+    - ${DATADIR}/openldap/config.cfg:/var/www/html/config/config.cfg
+    - ${DATADIR}/openldap/default.conf:/var/www/html/config/default.conf
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.lam-rtr.entrypoints=https"
+      - "traefik.http.routers.lam-rtr.rule=Host(`lam.eisvogelweg2.de`)"
+      - "traefik.http.routers.lam-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.lam-rtr.middlewares=chain-no-auth@file" # No Authentication
+        #      - "traefik.http.routers.lam-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.lam-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.lam-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.lam-rtr.service=lam-svc"
+      - "traefik.http.services.lam-svc.loadbalancer.server.port=8080"
+
+  phpldapadmin:
+    image: osixia/phpldapadmin
+    container_name: phpldapadmin
+    networks:
+      - t2_proxy
+      #    volumes:
+      #    - ./config.cfg:/var/www/html/config/config.cfg
+      #    - ./default.conf:/var/www/html/config/default.conf
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+      - PHPLDAPADMIN_HTTPS="false"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.ldapadmin-rtr.entrypoints=https"
+      - "traefik.http.routers.ldapadmin-rtr.rule=Host(`ldapadmin.eisvogelweg2.de`)"
+      - "traefik.http.routers.ldapadmin-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.ldapadmin-rtr.middlewares=chain-no-auth@file" # No Authentication
+        #      - "traefik.http.routers.ldapadmin-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.ldapadmin-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.ldapadmin-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.ldapadmin-rtr.service=ldapadmin-svc"
+      - "traefik.http.services.ldapadmin-svc.loadbalancer.server.port=80"
+
+
+networks:
+  t2_proxy:
+    external: true
