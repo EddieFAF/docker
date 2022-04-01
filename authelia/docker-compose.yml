@@ -19,6 +19,7 @@ services:
         #      - authelia_mysql
     volumes:
       - ${DATADIR}/authelia/config.yml:/config/configuration.yml:ro
+      - ${DATADIR}/authelia/config/:/config
     environment:
       - TZ=${TZ}
     labels:
@@ -60,6 +61,8 @@ services:
     container_name: redis
     expose:
       - 6379
+    volumes:
+      - ${DATADIR}/authelia/redis:/data
     networks:
       - t2_proxy
 
@@ -123,6 +126,8 @@ services:
     environment:
       - PHPLDAPADMIN_LDAP_HOSTS=openldap
       - PHPLDAPADMIN_HTTPS="false"
+    volumes:
+      - ${DATADIR}/phpldapadmin/data:/var/www/phpldapadmin
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

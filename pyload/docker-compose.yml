@@ -2,7 +2,7 @@
 version: "2.1"
 services:
   pyload:
-    image: ghcr.io/linuxserver/pyload:latest
+    image: ghcr.io/linuxserver/pyload-ng:latest
     container_name: pyload
     environment:
       - PUID=1000
