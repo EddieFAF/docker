@@ -23,6 +23,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.hammond-rtr.service=hammond-svc"
       - "traefik.http.services.hammond-svc.loadbalancer.server.port=3000"
+
+      - "com.centurylinklabs.watchtower.enable=true"
+      - flame.type=application # "app" works too
+      - flame.name=Hammond
+      - flame.url=https://tanken.eisvogelweg2.de
+      - flame.icon=docker # Optional, default is "docker"
     networks:
       - t2_proxy
 

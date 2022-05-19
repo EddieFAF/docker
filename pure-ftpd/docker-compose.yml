@@ -11,10 +11,13 @@ services:
             - "/mnt/nasgard/Import/scanner:/home/scanner"
             - "/opt/docker-data/pure-ftpd/passwd:/etc/pure-ftpd/passwd"
             - "/opt/docker-data/pure-ftpd/users:/home/ftpusers"
+            - "/opt/docker-data/shared/certs/cert.pem:/etc/ssl/private/pure-ftpd-cert.pem"
+            - "/opt/docker-data/shared/certs/key.pem:/etc/ssl/private/pure-ftpd-key.pem"
         environment:
             PUBLICHOST: "192.168.2.22"
             FTP_USER_NAME: scanner
             FTP_USER_PASS: nextcloud
             FTP_USER_HOME: /home/scanner
+            ADDED_FLAGS: "--tls=2"
         restart: always
 
