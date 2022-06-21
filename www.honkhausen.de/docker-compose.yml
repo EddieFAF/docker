@@ -15,6 +15,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/mods:swag-auto-reload
     networks:
       - t2_proxy
     labels:
