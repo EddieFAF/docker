@@ -1,15 +1,17 @@
 ---
 version: "2.1"
 services:
-  jellyfin:
+  jellyfin_traefik:
     image: ghcr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
+    container_name: jellyfin_traefik
+    networks:
+      - t2_proxy
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
       - UMASK=<022> #optional
-      - JELLYFIN_PublishedServerUrl=192.168.2.22
+      - JELLYFIN_PublishedServerUrl=jellyfin.eisvogelweg2.de
     volumes:
       - ${DATADIR}/jellyfin:/config
       - /mnt/nasgard/Medien/Serien:/data/tvshows
@@ -23,10 +25,21 @@ services:
       - /mnt/nasgard/Medien/Music/Musik:/data/musik
       - /mnt/nasgard/Medien/Music/Various:/data/variousmusik
     labels:
-      - flame.type=application # "app" works too
-      - flame.name=jellyfin
-      - flame.url=https://192.168.2.22:8096
-      - flame.icon=jellyfin.png
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
+      - "traefik.http.routers.jellyfin-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.jellyfin-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.jellyfin-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
+      - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+
+      - "com.centurylinklabs.watchtower.enable=true"
     ports:
       - 8096:8096
       - 8920:8920 #optional
@@ -40,4 +53,8 @@ services:
             #- /dev/video11:/dev/video11 #optional
             #- /dev/video12:/dev/video12 #optional
     restart: unless-stopped
+
+networks:
+  t2_proxy:
+    external: true
 

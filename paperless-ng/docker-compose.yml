@@ -40,6 +40,8 @@ services:
       - intern
     volumes:
       - ${DATADIR}/paperless/redis/data:/data
+    labels:
+      - 'wud.tag.include=^\d.\+\d+$$'
 
   paperless-db:
     image: postgres:13
@@ -53,6 +55,8 @@ services:
       POSTGRES_PASSWORD: paperless
     networks:
       - intern
+    labels:
+      - 'wud.tag.include=^\d.\+\d+$$'
 
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
@@ -83,6 +87,7 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{document_type}/{created_year}{created_month}{created_day} - {title}, {tag_list}"
+      PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: "True"
       PAPERLESS_ALLOWED_HOSTS: eisvogelweg2.de,paperless.eisvogelweg2.de,localhost
       PAPERLESS_CORS_ALLOWED_HOSTS: http://paperless.eisvogelweg2.de,http://localhost:8000
     networks:
@@ -116,6 +121,8 @@ services:
       CHROMIUM_DISABLE_ROUTES: 1
     networks:
       - intern
+    labels:
+      - 'wud.tag.include=^\d.\+\d+$$'
 
   tika:
     image: apache/tika

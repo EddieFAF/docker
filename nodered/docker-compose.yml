@@ -13,6 +13,7 @@ services:
     volumes:
       # Local path where all Node-RED config will be stored.
       - ${DATADIR}/nodered/data:/data
+      - /home/eddie/docker/homeassistant/config/tmp:/hatmp
     networks:
       - t2_proxy
     environment:

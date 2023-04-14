@@ -2,7 +2,7 @@ version: "3.7"
 services:
 # Guacamole Daemon - Needed for Guacamole
   guacd:
-    image: guacamole/guacd
+    image: guacamole/guacd:latest
     container_name: guacd
     restart: unless-stopped
     security_opt:
