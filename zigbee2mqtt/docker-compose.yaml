@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    volumes:
+      - ${DATADIR}/zigbee2mqtt/data:/app/data
+      - /run/udev:/run/udev:ro
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - 48080:8080
+    devices:
+      - /dev/ttyUSB0:/dev/ttyACM0
+    group_add:
+      - dialout
+    user: 1000:1000
+    labels:
+      - "traefik.enable=false"
+      ## HTTP Routers
+      - "traefik.http.routers.zigbee2mqtt-rtr.entrypoints=https"
+      - "traefik.http.routers.zigbee2mqtt-rtr.rule=HostHeader(`zigbee2mqtt.$DOMAINNAME`)"
+      - "traefik.http.routers.zigbee2mqtt-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.zigbee2mqtt-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.zigbee2mqtt-rtr.service=zigbee2mqtt-svc"
+      - "traefik.http.services.zigbee2mqtt-svc.loadbalancer.server.port=8080"
+      - flame.type=application # "app" works too
+      - flame.name=zigbee2mqtt
+      - flame.url=https://suche.eisvogelweg2.de
+      - flame.icon=search-web # Optional, default is "docker"
+
+networks:
+  t2_proxy:
+    external: true
+
+
+

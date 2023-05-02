@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+
+  navidrome:
+    container_name: navidrome
+    image: deluan/navidrome:latest
+    restart: unless-stopped
+    ports:
+      - "4533:4533"
+    networks:
+      - t2_proxy
+    volumes:
+      - /mnt/nasgard/Medien/Music/Musik:/music:ro
+      - ${DATADIR}/navidrome/data:/data
+    environment:
+      - ND_SCANSCHEDULE=1h
+      - ND_LOGLEVEL=info
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.navidrome-rtr.entrypoints=https"
+      - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAINNAME`)"
+      - "traefik.http.routers.navidrome-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
+      - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
+      - flame.type=application # "app" works too
+      - flame.name=navidrome
+      - flame.url=https://navidrome.eisvogelweg2.de
+      - flame.icon=search-web # Optional, default is "docker"
+
+networks:
+  t2_proxy:
+    external: true
