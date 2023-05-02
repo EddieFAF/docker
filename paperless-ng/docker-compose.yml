@@ -70,14 +70,14 @@ services:
     ports:
       - 8100:8000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000" ]
       interval: 30s
       timeout: 10s
       retries: 5
     volumes:
       - ${DATADIR}/paperless/data:/usr/src/paperless/data
-      - ${DATADIR}/paperless/media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
+      - /mnt/nasgard/Projekte/Paperless/media:/usr/src/paperless/media
+      - /mnt/nasgard/Projekte/Paperless/export:/usr/src/paperless/export
       - /mnt/nasgard/Import/paperless:/usr/src/paperless/consume
     env_file: docker-compose.env
     environment:
@@ -88,7 +88,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{document_type}/{created_year}{created_month}{created_day} - {title}, {tag_list}"
       PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: "True"
-      PAPERLESS_ALLOWED_HOSTS: eisvogelweg2.de,paperless.eisvogelweg2.de,localhost
+      PAPERLESS_ALLOWED_HOSTS: eisvogelweg2.de,paperless.eisvogelweg2.de,localhost,192.168.2.22
       PAPERLESS_CORS_ALLOWED_HOSTS: http://paperless.eisvogelweg2.de,http://localhost:8000
     networks:
       - intern
@@ -101,8 +101,8 @@ services:
       - "traefik.http.routers.paperless-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.paperless-rtr.middlewares=chain-no-auth@file" # No Authentication
-#      - "traefik.http.routers.paperless-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-#      - "traefik.http.routers.paperless-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      #      - "traefik.http.routers.paperless-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+      #      - "traefik.http.routers.paperless-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
       ## HTTP Services
       - "traefik.http.routers.paperless-rtr.service=paperless-svc"
       - "traefik.http.services.paperless-svc.loadbalancer.server.port=8000"
@@ -136,4 +136,3 @@ networks:
     external: true
   intern:
     external: true
-

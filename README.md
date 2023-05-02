@@ -6,16 +6,11 @@ docker related files
 
 Here I collect everything related to Docker.
 
-The repository is divided into two sections, based on the reverse proxy being used.
+All services use either traefik as reverse proxy or are only used locally (no proxy).
 
-## traefik
-Here all projects using Traefik as their revers proxy are placed.
+The services using traefik depend on traefik running (obviously) and the labels use middlewares etc
+defined in the traefik config.
 
-## nginx
-NGINX as a reverse proxy is used for those projects.
-
-
-Currently it contains these projects:
-- nginx (as webserver)
-- redis
+### Installation
+All traefik services use a docker network called t2_proxy. To create this network use:
 

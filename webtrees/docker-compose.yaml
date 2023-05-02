@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+
+  webtrees:
+    container_name: webtrees
+    image: dtjs48jkt/webtrees:latest
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+      - intern
+    volumes:
+      - ${DATADIR}/webtrees/data:/var/www/html/data
+    environment:
+      - TZ=Europe/Berlin
+      - DB_NAME=webtrees
+      - DB_HOST=webtrees-db
+      - DB_USER=webtrees
+      - DB_PASSWORD=webpassword
+      - GROUP_ID=1000
+      - PORT=80
+      - DISABLE_SSL=TRUE #    ports:
+      #      - 8088:8079
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.webtrees-rtr.entrypoints=https"
+      - "traefik.http.routers.webtrees-rtr.rule=Host(`stammbaum.$DOMAINNAME`)"
+      - "traefik.http.routers.webtrees-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.webtrees-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.webtrees-rtr.service=webtrees-svc"
+      - "traefik.http.services.webtrees-svc.loadbalancer.server.port=80"
+      - flame.type=application # "app" works too
+      - flame.name=webtrees
+      - flame.url=https://stammbaum.eisvogelweg2.de
+      - flame.icon=search-web # Optional, default is "docker"
+
+  webtrees-db:
+    container_name: webtrees-db
+    image: mariadb:10.5
+    restart: always
+    environment:
+      - MYSQL_DATABASE=webtrees
+      - MYSQL_USER=webtrees
+      - MYSQL_PASSWORD=webpassword
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+    volumes:
+      - ${DATADIR}/webtrees/db:/var/lib/mysql
+    networks:
+      - intern
+    labels:
+      - 'wud.tag.include=^\d+\.\d+\.\d+$$'
+
+networks:
+  t2_proxy:
+    external: true
+  intern:
+    external: true
