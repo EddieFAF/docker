@@ -1,70 +1,196 @@
-version: '3.3'
+version: "3.2"
+
 services:
-  nextcloud-db:
-    image: mariadb:10.5
-    container_name: nextcloud-db
-    command: --transaction-isolation=READ-COMMITTED --log-bin=ROW
-    restart: unless-stopped
+  # nc_db:
+  #   image: mariadb:10.2
+  #   container_name: nextcloud_db
+  #   volumes:
+  #     - "db:/var/lib/mysql"
+  #   networks:
+  #     - intern
+  #   environment:
+  #     - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+  #     - "MYSQL_DATABASE=${NC_MYSQL_DATABASE}"
+  #     - "MYSQL_USER=${NC_MYSQL_USER}"
+  #     - "MYSQL_PASSWORD=${NC_MYSQL_PASSWORD}"
+  #   restart: always
+
+  nc_pgdb:
+    image: postgres:14
+    container_name: nextcloud_postgres_db
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-      - ${DATADIR}/nextcloud/database:/var/lib/mysql
+      - "pgdb:/var/lib/postgresql/data"
+    networks:
+      - intern
     environment:
-      - MYSQL_ROOT_PASSWORD=${NC_MYSQL_ROOT_PASSWORD} #SQL root Passwort eingeben
-      - MYSQL_PASSWORD=${NC_MYSQL_PASSWORD} #SQL Benutzer Passwort eingeben
-      - MYSQL_DATABASE=${NC_MYSQL_DATABASE} #Datenbank Name
-      - MYSQL_USER=${NC_MYSQL_USER} #SQL Nutzername
-      - MYSQL_INITDB_SKIP_TZINFO=1
-    networks:
-      - default
+      - "POSTGRES_DB=${NC_MYSQL_DATABASE}"
+      - "POSTGRES_USER=${NC_MYSQL_USER}"
+      - "POSTGRES_PASSWORD=${NC_MYSQL_PASSWORD}"
+    restart: always
 
-  nextcloud-redis:
-    image: redis:alpine
-    container_name: nextcloud-redis
-    hostname: nextcloud-redis
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
     networks:
-        - default
-    restart: unless-stopped
+      - intern
+    environment:
+      PGADMIN_DEFAULT_EMAIL: eddie.faf@googlemail.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+
+  nc_redis:
+    image: redis:6-alpine
+    container_name: nextcloud_redis
     volumes:
-        - ${DATADIR}/nextcloud/redis:/data
-    command: redis-server --requirepass nexttest # Redis Passwort eingeben
+      - "redis:/data"
+    networks:
+      - intern
+    environment:
+      - "TZ"
+    restart: always
 
-  nextcloud-app:
-    image: nextcloud:latest
-    container_name: nextcloud-app
-    restart: unless-stopped
+  nc_msmtpd:
+    image: crazymax/msmtpd:latest
+    container_name: nextcloud_msmtpd
+    networks:
+      - intern
+    env_file:
+      - "./msmtpd.env"
+    environment:
+      - "TZ"
+    restart: always
+
+  nextcloud:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud
     depends_on:
-      - nextcloud-redis
-      - nextcloud-db
-    environment:
-        REDIS_HOST: nextcloud-redis
-        REDIS_HOST_PASSWORD: nexttest # Redis Passwort von oben wieder eingeben
-        NEXTCLOUD_TRUSTED_DOMAINS: nextcloud.${DOMAINNAME}
-        TRUSTED_PROXIES: 192.168.90.0/24
+      - nc_pgdb
+      - nc_redis
+      - nc_msmtpd
     volumes:
-      - ${DATADIR}/nextcloud/app:/var/www/html
-      - ${DATADIR}/nextcloud/daten:/var/www/html/data
-      - ${DATADIR}/nextcloud/daten/external:/var/www/html/data/external
-      - /home/eddie/Import:/var/www/html/data/import # Import Folder
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.nextcloud.middlewares=nextcloud,nextcloud-caldav
-        #      - traefik.http.routers.nextcloud.tls.certresolver=le
-      - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAINNAME}`)
-      - traefik.http.middlewares.nextcloud.headers.customFrameOptionsValue=SAMEORIGIN
-      - traefik.http.middlewares.nextcloud.headers.contentSecurityPolicy=frame-ancestors 'self' ${DOMAINNAME} *.${DOMAINNAME}
-      - traefik.http.middlewares.nextcloud.headers.stsSeconds=155520011
-      - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
-      - traefik.http.middlewares.nextcloud.headers.stsPreload=true
-       #      - traefik.http.middlewares.nextcloud_redirect.redirectregex.regex=/.well-known/(card|cal)dav
-       #      - traefik.http.middlewares.nextcloud_redirect.redirectregex.replacement=/remote.php/dav/
-      - traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true
-      - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
-      - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
+      - "nextcloud:/data"
+      - /mnt/:/mnt/
     networks:
       - t2_proxy
-      - default
+      - intern
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.entrypoints=https"
+      - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.eisvogelweg2.de`)"
+      #      - "traefik.http.routers.nextcloud.middlewares=nextcloud-dav,nextcloud-wellknown"
+      - "traefik.http.routers.nextcloud.middlewares=chain-nextcloud@file,nextcloud-dav,nextcloud-wellknown"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.tls.domains[0].main=nextcloud.eisvogelweg2.de"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.nextcloud-dav.replacepathregex.regex=^/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.nextcloud-dav.replacepathregex.replacement=/remote.php/dav/"
+      - "traefik.http.middlewares.nextcloud-wellknown.redirectregex.regex=(/.well-known.*)"
+      - "traefik.http.middlewares.nextcloud-wellknown.redirectregex.replacement=/index.php$${1}"
+
+      - flame.type=application # "app" works too
+      - flame.name=nextcloud
+      - flame.url=https://nextcloud.eisvogelweg2.de
+      - flame.icon=nextcloud.png # Optional, default is "docker"
+    env_file:
+      - "./nextcloud.env"
+    environment:
+      - "TZ"
+      - "PUID"
+      - "PGID"
+      - "DB_TYPE=pgsql"
+      - "DB_HOST=nc_pgdb"
+      - "DB_NAME=${NC_MYSQL_DATABASE}"
+      - "DB_USER=${NC_MYSQL_USER}"
+      - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
+      - "TRUSTED_PROXIES=192.168.90.0/24"
+    restart: always
+
+  cron:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud_cron
+    depends_on:
+      - nextcloud
+    networks:
+      - intern
+    volumes:
+      - "nextcloud:/data"
+    env_file:
+      - "./nextcloud.env"
+    environment:
+      - "TZ"
+      - "PUID"
+      - "PGID"
+      - "DB_TYPE=pgsql"
+      - "DB_HOST=nc_pgdb"
+      - "DB_NAME=${NC_MYSQL_DATABASE}"
+      - "DB_USER=${NC_MYSQL_USER}"
+      - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
+      - "SIDECAR_CRON=1"
+      - "CRON_PERIOD=*/5 * * * *"
+    restart: always
+
+  previewgen:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud_previewgen
+    depends_on:
+      - nextcloud
+    networks:
+      - intern
+    volumes:
+      - "nextcloud:/data"
+    env_file:
+      - "./nextcloud.env"
+    environment:
+      - "TZ"
+      - "PUID"
+      - "PGID"
+      - "DB_TYPE=pgsql"
+      - "DB_HOST=nc_pgdb"
+      - "DB_NAME=${NC_MYSQL_DATABASE}"
+      - "DB_USER=${NC_MYSQL_USER}"
+      - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
+      - "SIDECAR_PREVIEWGEN=1"
+      - "PREVIEWGEN_PERIOD=0 * * * *"
+    restart: always
+
+  news_updater:
+    image: crazymax/nextcloud:latest
+    container_name: nextcloud_news_updater
+    networks:
+      - intern
+    depends_on:
+      - nextcloud
+    volumes:
+      - "nextcloud:/data"
+    env_file:
+      - "./nextcloud.env"
+    environment:
+      - "TZ"
+      - "PUID"
+      - "PGID"
+      - "DB_TYPE=pgsql"
+      - "DB_HOST=nc_pgdb"
+      - "DB_NAME=${NC_MYSQL_DATABASE}"
+      - "DB_USER=${NC_MYSQL_USER}"
+      - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
+      - "SIDECAR_NEWSUPDATER=0"
+      - "NC_NEWSUPDATER_THREADS=10"
+      - "NC_NEWSUPDATER_TIMEOUT=300"
+      - "NC_NEWSUPDATER_INTERVAL=900"
+      - "NC_NEWSUPDATER_LOGLEVEL=error"
+    restart: always
+
+volumes:
+  db:
+  nextcloud:
+  redis:
+  pgdb:
+
+
 networks:
   t2_proxy:
     external: true
-
+  intern:
+    external: true

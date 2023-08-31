@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-# Node-RED
+  # Node-RED
   nodered:
     container_name: nodered
     image: nodered/node-red
@@ -27,9 +27,9 @@ services:
       - "traefik.http.routers.nodered-rtr.rule=Host(`nodered.$DOMAINNAME`)"
       - "traefik.http.routers.nodered-rtr.tls=true"
       ## Middlewares
-#      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file" # No Authentication
-#      - "traefik.http.routers.nodered-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-#      - "traefik.http.routers.nodered-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      #      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file" # No Authentication
+      #      - "traefik.http.routers.nodered-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+      #      - "traefik.http.routers.nodered-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
       - "traefik.http.routers.nodered-rtr.middlewares=chain-authelia@file" # Authelia Authentication
       ## HTTP Services
       - "traefik.http.routers.nodered-rtr.service=nodered-svc"
@@ -44,6 +44,3 @@ services:
 networks:
   t2_proxy:
     external: true
-
-
-

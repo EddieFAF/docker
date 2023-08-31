@@ -11,7 +11,8 @@ services:
     networks:
       - t2_proxy
     volumes:
-      - /mnt/nasgard/Medien/Music/Musik:/music:ro
+      - /mnt/nasgard/Medien/Music/Musik:/music/albums:ro
+      - /mnt/nasgard/Medien/Music/Various:/music/sampler:ro
       - ${DATADIR}/navidrome/data:/data
     environment:
       - ND_SCANSCHEDULE=1h

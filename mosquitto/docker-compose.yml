@@ -11,24 +11,24 @@ services:
       - ${DATADIR}/mosquitto/config:/mosquitto/config
       - ${DATADIR}/mosquitto/data:/mosquitto/data
       - ${DATADIR}/mosquitto/log:/mosquitto/log
-    expose:
-      - 8883
-      - 9001
+    ports:
+      - 1883:1883
+      - 9001:9001
+        #    expose:
+        #      - 1883
+        #      - 9001
     networks:
       - t2_proxy
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=false"
       - "traefik.docker.network=t2_proxy"
-      - "traefik.http.routers.mqtt.rule=Host(`mqtt.eisvogelweg2.de`)"
-      - "traefik.http.routers.mqtt.entrypoints=https"
-      - "traefik.http.routers.mqtt.tls.certresolver=default"
-      - "traefik.tcp.routers.mqtt.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.mqtt.tls.certresolver=default"
-      - "traefik.tcp.services.mqtt.loadbalancer.server.port=8883"
       - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
-      - "traefik.http.services.mqtt.loadbalancer.server.port=9001"
-
+      - "traefik.tcp.routers.mqtt.rule=HostSNI(`mqtt.eisvogelweg2.de`)"
+      - "traefik.tcp.routers.mqtt.tls=true"
+      - "traefik.tcp.routers.mqtt.tls.certResolver=default"
+      - "traefik.tcp.routers.mqtt.service=mqtt-svc"
+      - "traefik.tcp.services.mqtt-svc.loadbalancer.server.port=1883"
         #      - "traefik.tcp.routers.tcpr_mqtt_websocket.entrypoints=websocket"
         #      - "traefik.tcp.routers.tcpr_mqtt_websocket.rule=HostSNI(`mqtt.eisvogelweg2.de`)"
         #      - "traefik.tcp.routers.tcpr_mqtt_websocket.service=mqtt_websocket"
