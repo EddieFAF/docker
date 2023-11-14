@@ -1,47 +1,36 @@
-version: "3.3"
+version: '3.7'
+
 services:
 
-# NGINX as Webserver for www.eisvogelweg2.de
-  nginx:
+  www:
     container_name: www.eisvogelweg2.de
-    restart: unless-stopped
-    image: ghcr.io/linuxserver/nginx:latest
-    volumes:
-      - ${DATADIR}/www.eisvogelweg2.de/config:/config
-#    ports:
-#      - 50080:80
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+    image: nginx:latest
+    restart: always
     networks:
       - t2_proxy
+    volumes:
+      - ${DATADIR}/www.eisvogelweg2.de/www:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./log:/var/log/nginx
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.eisvogelweg2-rtr.entrypoints=https"
-      - "traefik.http.routers.eisvogelweg2-rtr.rule=Host(`www.$DOMAINNAME`)"
-      - "traefik.http.routers.eisvogelweg2-rtr.tls=true"
-#      - "traefik.http.routers.portainer-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.eisvogelweg-rtr.entrypoints=https"
+      - "traefik.http.routers.eisvogelweg-rtr.rule=Host(`www.$DOMAINNAME`)"
+      - "traefik.http.routers.eisvogelweg-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.eisvogelweg2-rtr.middlewares=chain-no-auth@file" # No Authentication
-#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      - "traefik.http.routers.eisvogelweg-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.eisvogelweg2-rtr.service=eisvogelweg2-svc"
-      - "traefik.http.services.eisvogelweg2-svc.loadbalancer.server.port=80"
-      ## Watchtower
-      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.eisvogelweg-rtr.service=eisvogelweg-svc"
+      - "traefik.http.services.eisvogelweg-svc.loadbalancer.server.port=80"
       - flame.type=application # "app" works too
-      - flame.name=www.eisvogelweg2.de
+      - flame.name=eisvogelweg
       - flame.url=https://www.eisvogelweg2.de
       - flame.icon=nginx.png # Optional, default is "docker"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://www.eisvogelweg2.de || exit 1"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 5
 
 networks:
   t2_proxy:
     external: true
+
+
+

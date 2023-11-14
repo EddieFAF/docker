@@ -1,50 +1,50 @@
 version: "3.2"
 
 services:
-  # nc_db:
-  #   image: mariadb:10.2
-  #   container_name: nextcloud_db
+  nc_db:
+    image: mariadb:10.7
+    container_name: nextcloud_db
+    volumes:
+      - "${DATADIR}/nextcloud/db:/var/lib/mysql"
+    networks:
+      - intern
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+      - "MYSQL_DATABASE=${NC_MYSQL_DATABASE}"
+      - "MYSQL_USER=${NC_MYSQL_USER}"
+      - "MYSQL_PASSWORD=${NC_MYSQL_PASSWORD}"
+    restart: always
+
+  # nc_pgdb:
+  #   image: postgres:14
+  #   container_name: nextcloud_postgres_db
   #   volumes:
-  #     - "db:/var/lib/mysql"
+  #     - "pgdb:/var/lib/postgresql/data"
   #   networks:
   #     - intern
   #   environment:
-  #     - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
-  #     - "MYSQL_DATABASE=${NC_MYSQL_DATABASE}"
-  #     - "MYSQL_USER=${NC_MYSQL_USER}"
-  #     - "MYSQL_PASSWORD=${NC_MYSQL_PASSWORD}"
+  #     - "POSTGRES_DB=${NC_MYSQL_DATABASE}"
+  #     - "POSTGRES_USER=${NC_MYSQL_USER}"
+  #     - "POSTGRES_PASSWORD=${NC_MYSQL_PASSWORD}"
   #   restart: always
-
-  nc_pgdb:
-    image: postgres:14
-    container_name: nextcloud_postgres_db
-    volumes:
-      - "pgdb:/var/lib/postgresql/data"
-    networks:
-      - intern
-    environment:
-      - "POSTGRES_DB=${NC_MYSQL_DATABASE}"
-      - "POSTGRES_USER=${NC_MYSQL_USER}"
-      - "POSTGRES_PASSWORD=${NC_MYSQL_PASSWORD}"
-    restart: always
-
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    restart: always
-    networks:
-      - intern
-    environment:
-      PGADMIN_DEFAULT_EMAIL: eddie.faf@googlemail.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "5050:80"
+  #
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   networks:
+  #     - intern
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: eddie.faf@googlemail.com
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #   ports:
+  #     - "5050:80"
 
   nc_redis:
-    image: redis:6-alpine
+    image: redis:7.2-alpine
     container_name: nextcloud_redis
     volumes:
-      - "redis:/data"
+      - "${DATADIR}/nextcloud/redis:/data"
     networks:
       - intern
     environment:
@@ -66,11 +66,12 @@ services:
     image: crazymax/nextcloud:latest
     container_name: nextcloud
     depends_on:
-      - nc_pgdb
+      - nc_db
       - nc_redis
       - nc_msmtpd
     volumes:
-      - "nextcloud:/data"
+      - "${DATADIR}/nextcloud/nextcloud:/data"
+      #-  "./nextcloud.log:/data/nextcloud.log"
       - /mnt/:/mnt/
     networks:
       - t2_proxy
@@ -80,11 +81,11 @@ services:
       - "traefik.http.routers.nextcloud.entrypoints=https"
       - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.eisvogelweg2.de`)"
       #      - "traefik.http.routers.nextcloud.middlewares=nextcloud-dav,nextcloud-wellknown"
-      - "traefik.http.routers.nextcloud.middlewares=chain-nextcloud@file,nextcloud-dav,nextcloud-wellknown"
+      - "traefik.http.routers.nextcloud.middlewares=chain-nextcloud@file,nextcloud-dav"
       - "traefik.http.routers.nextcloud.tls=true"
       - "traefik.http.routers.nextcloud.tls.domains[0].main=nextcloud.eisvogelweg2.de"
       - "traefik.http.services.nextcloud.loadbalancer.server.port=8000"
-      - "traefik.http.middlewares.nextcloud-dav.replacepathregex.regex=^/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.nextcloud-dav.replacepathregex.regex=^/.well-known/ca(rd|l)dav"
       - "traefik.http.middlewares.nextcloud-dav.replacepathregex.replacement=/remote.php/dav/"
       - "traefik.http.middlewares.nextcloud-wellknown.redirectregex.regex=(/.well-known.*)"
       - "traefik.http.middlewares.nextcloud-wellknown.redirectregex.replacement=/index.php$${1}"
@@ -99,12 +100,17 @@ services:
       - "TZ"
       - "PUID"
       - "PGID"
-      - "DB_TYPE=pgsql"
-      - "DB_HOST=nc_pgdb"
+      - "DB_TYPE=mysql"
+      - "DB_HOST=nc_db"
       - "DB_NAME=${NC_MYSQL_DATABASE}"
       - "DB_USER=${NC_MYSQL_USER}"
       - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
       - "TRUSTED_PROXIES=192.168.90.0/24"
+      - "OVERWRITEPROTOCOL=https"
+      - "OVERWRITECLIURL=https://nextcloud.eisvogelweg2.de"
+      - "OVERWRITEHOST=nextcloud.eisvogelweg2.de"
+      - "REDIS_HOST=nc_redis"
+
     restart: always
 
   cron:
@@ -115,15 +121,15 @@ services:
     networks:
       - intern
     volumes:
-      - "nextcloud:/data"
+      - "${DATADIR}/nextcloud/nextcloud:/data"
     env_file:
       - "./nextcloud.env"
     environment:
       - "TZ"
       - "PUID"
       - "PGID"
-      - "DB_TYPE=pgsql"
-      - "DB_HOST=nc_pgdb"
+      - "DB_TYPE=mysql"
+      - "DB_HOST=nc_db"
       - "DB_NAME=${NC_MYSQL_DATABASE}"
       - "DB_USER=${NC_MYSQL_USER}"
       - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
@@ -139,15 +145,15 @@ services:
     networks:
       - intern
     volumes:
-      - "nextcloud:/data"
+      - "${DATADIR}/nextcloud/nextcloud:/data"
     env_file:
       - "./nextcloud.env"
     environment:
       - "TZ"
       - "PUID"
       - "PGID"
-      - "DB_TYPE=pgsql"
-      - "DB_HOST=nc_pgdb"
+      - "DB_TYPE=mysql"
+      - "DB_HOST=nc_db"
       - "DB_NAME=${NC_MYSQL_DATABASE}"
       - "DB_USER=${NC_MYSQL_USER}"
       - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
@@ -163,15 +169,15 @@ services:
     depends_on:
       - nextcloud
     volumes:
-      - "nextcloud:/data"
+      - "${DATADIR}/nextcloud/nextcloud:/data"
     env_file:
       - "./nextcloud.env"
     environment:
       - "TZ"
       - "PUID"
       - "PGID"
-      - "DB_TYPE=pgsql"
-      - "DB_HOST=nc_pgdb"
+      - "DB_TYPE=mysql"
+      - "DB_HOST=nc_db"
       - "DB_NAME=${NC_MYSQL_DATABASE}"
       - "DB_USER=${NC_MYSQL_USER}"
       - "DB_PASSWORD=${NC_MYSQL_PASSWORD}"
@@ -182,12 +188,51 @@ services:
       - "NC_NEWSUPDATER_LOGLEVEL=error"
     restart: always
 
-volumes:
-  db:
-  nextcloud:
-  redis:
-  pgdb:
+  # mysql-cron-backup:
+  #   image: fradelg/mysql-cron-backup
+  #   container_name: nextcloud_db_backup
+  #   depends_on:
+  #     - nc_db
+  #   volumes:
+  #     - ~/backup/nextcloud/db:/backup
+  #   environment:
+  #     - MYSQL_HOST=nc_db
+  #     - MYSQL_USER=${NC_MYSQL_USER}
+  #     - MYSQL_PASS=${NC_MYSQL_PASSWORD}
+  #     - MAX_BACKUPS=15
+  #     - INIT_BACKUP=0
+  #     # Every day at 03:00
+  #     - CRON_TIME=0 3 * * *
+  #     # Make it small
+  #     - GZIP_LEVEL=9
+  #   networks:
+  #     - intern
+  #   restart: unless-stopped
 
+  nextcloud_db_backup:
+    container_name: nextcloud_db_backup
+    image: tiredofit/db-backup
+    restart: always
+    links:
+      - nc_db
+    volumes:
+      - ~/backup/nextcloud/db:/backup
+      - ./post-script.sh:/assets/custom-scripts/post-script.sh
+    environment:
+      - DB_TYPE=mariadb
+      - DB_HOST=nc_db
+      - DB_NAME=${NC_MYSQL_DATABASE}
+      - DB_USER=${NC_MYSQL_USER}
+      - DB_PASS=${NC_MYSQL_PASSWORD}
+      - DB_DUMP_FREQ=1440
+      - DB_DUMP_BEGIN=0000
+      - DB_CLEANUP_TIME=8640
+      - MD5=TRUE
+      - COMPRESSION=GZ
+      - SPLIT_DB=TRUE
+      - CONTAINER_ENABLE_MONITORING=false
+    networks:
+      - intern
 
 networks:
   t2_proxy:

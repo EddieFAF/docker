@@ -1,0 +1,23 @@
+---
+version: "2.1"
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: homeassistant
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=998
+      - TZ=Europe/Berlin
+    labels:
+      - flame.type=application # "app" works too
+      - flame.name=home assistant
+      - flame.url=https://homeassistant.eisvogelweg2.de
+      - flame.icon=home-assistant.png # Optional, default is "docker"
+    volumes:
+      - ./config:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+        #    devices:
+      #      - /dev/ttyUSB0:/dev/ttyUSB0
+    restart: unless-stopped
+

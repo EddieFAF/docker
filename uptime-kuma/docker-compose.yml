@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+
+  uptime-kuma:
+    container_name: uptime-kuma
+    image: louislam/uptime-kuma
+    restart: always
+    networks:
+      - t2_proxy
+    volumes:
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.uptime-kuma-rtr.entrypoints=https"
+      - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptime.$DOMAINNAME`)"
+      - "traefik.http.routers.uptime-kuma-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
+      - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"
+      - flame.type=application # "app" works too
+      - flame.name=uptime-kuma
+      - flame.url=https://uptime.eisvogelweg2.de
+      - flame.icon=uptime-kuma.png # Optional, default is "docker"
+
+networks:
+  t2_proxy:
+    external: true

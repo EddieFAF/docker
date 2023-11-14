@@ -1,0 +1,89 @@
+version: '3.7'
+
+services:
+
+  filtron:
+    container_name: filtron
+    image: dalf/filtron
+    restart: always
+    ports:
+      - "127.0.0.1:4040:4040"
+      - "127.0.0.1:4041:4041"
+    networks:
+      - searx
+    command: -listen 0.0.0.0:4040 -api 0.0.0.0:4041 -target searx:8080
+    volumes:
+      #      - ./rules.json:/etc/filtron/rules.json:rw
+      - /opt/docker-data/searx/filtron/:/etc/filtron
+    read_only: true
+    cap_drop:
+      - ALL
+
+  searx:
+    container_name: searx
+    image: searxng/searxng:latest
+    restart: always
+    networks:
+      - searx
+      - t2_proxy
+    command: ${SEARX_COMMAND:-}
+    volumes:
+      - /opt/docker-data/searx/data:/etc/searxng
+      - /opt/docker-data/searx/etc:/etc/searx
+      - /opt/docker-data/searx/log:/var/log/uwsgi
+    environment:
+      - BIND_ADDRESS=0.0.0.0:8080
+      - BASE_URL=https://${SEARX_HOSTNAME:-localhost}/
+      - MORTY_URL=https://${SEARX_HOSTNAME:-localhost}/morty/
+      - MORTY_KEY=${MORTY_KEY}
+      - INSTANCE_NAME=Eisvogel-Search
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.searx-rtr.entrypoints=https"
+      - "traefik.http.routers.searx-rtr.rule=Host(`suche.eisvogelweg2.de`)"
+      - "traefik.http.routers.searx-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.searx-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.searx-rtr.service=searx-svc"
+      - "traefik.http.services.searx-svc.loadbalancer.server.port=8080"
+      - flame.type=application # "app" works too
+      - flame.name=Searx
+      - flame.url=https://suche.eisvogelweg2.de
+      - flame.icon=searxmetasearchengine.png # Optional, default is "docker"
+
+
+  morty:
+    container_name: morty
+    image: dalf/morty
+    restart: always
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - searx
+    command: -timeout 6 -ipv6
+    environment:
+      - MORTY_KEY=${MORTY_KEY}
+      - MORTY_ADDRESS=0.0.0.0:3000
+    logging:
+      driver: none
+    read_only: true
+    cap_drop:
+      - ALL
+
+networks:
+  searx:
+    ipam:
+      driver: default
+  t2_proxy:
+    external: true
+
+

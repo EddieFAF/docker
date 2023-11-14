@@ -33,18 +33,20 @@
 version: "3.4"
 services:
   broker:
-    image: redis:6.0
+    image: redis:7.2-alpine
     container_name: paperless-redis
     restart: unless-stopped
     networks:
       - intern
     volumes:
       - ${DATADIR}/paperless/redis/data:/data
+    environment:
+      REDIS_ARGS: "--save 60 10"
     labels:
       - 'wud.tag.include=^\d.\+\d+$$'
 
   paperless-db:
-    image: postgres:13
+    image: postgres:16.0-alpine
     container_name: paperless-postgres
     restart: unless-stopped
     volumes:
@@ -57,6 +59,22 @@ services:
       - intern
     labels:
       - 'wud.tag.include=^\d.\+\d+$$'
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: paperless-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@eisvogelweg2.de
+      PGADMIN_DEFAULT_PASSWORD: ilikec0derz!
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - 15432:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    depends_on:
+      - paperless-db
+    networks:
+      - intern
 
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
@@ -130,6 +148,9 @@ services:
     restart: unless-stopped
     networks:
       - intern
+
+volumes:
+  pgadmin:
 
 networks:
   t2_proxy:

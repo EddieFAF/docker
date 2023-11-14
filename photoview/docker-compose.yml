@@ -2,7 +2,8 @@ version: "3"
 
 services:
   db:
-    image: mariadb:10.5
+    image: mariadb:10.7
+    container_name: photoview_db
     restart: always
     environment:
       - MYSQL_DATABASE=photoview
@@ -10,10 +11,13 @@ services:
       - MYSQL_PASSWORD=photosecret
       - MYSQL_RANDOM_ROOT_PASSWORD=1
     volumes:
-      - db_data:/var/lib/mysql
+      - ./db_data:/var/lib/mysql
+    networks:
+      - intern
 
   photoview:
-    image: viktorstrate/photoview:2
+    image: viktorstrate/photoview:latest
+    container_name: photoview_app
     restart: always
     ports:
       - "8000:80"
@@ -38,15 +42,34 @@ services:
       # - MAPBOX_TOKEN=<YOUR TOKEN HERE>
 
     volumes:
-      - api_cache:/app/cache
+      - ./api_cache:/app/cache
 
       # Change This: to the directory where your photos are located on your server.
       # If the photos are located at `/home/user/photos`, then change this value
       # to the following: `/home/user/photos:/photos:ro`.
       # You can mount multiple paths, if your photos are spread across multiple directories.
       - /mnt/photo:/photos:ro
+    networks:
+      - t2_proxy
+      - intern
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photoview-rtr.entrypoints=https"
+      - "traefik.http.routers.photoview-rtr.rule=Host(`photoview.eisvogelweg2.de`)"
+      - "traefik.http.routers.photoview-rtr.tls=true"
+      ## Middlewares
+#      - "traefik.http.routers.coder-rtr.middlewares=chain-no-auth@file" # No Authentication
+      - "traefik.http.routers.photoview-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.photoview-rtr.service=photoview-svc"
+      - "traefik.http.services.photoview-svc.loadbalancer.server.port=80"
 
-volumes:
-  db_data:
-  api_cache:
+networks:
+  t2_proxy:
+    external: true
+  intern:
+    external: true
 

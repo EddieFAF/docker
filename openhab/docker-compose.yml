@@ -1,36 +1,54 @@
----
-version: "2.2"
+version: '2.2'
+
 services:
   openhab:
-    image: openhab/openhab:latest
     container_name: openhab
-    #    ports:
-    #      - "9080:8080"
-    #      - "9443:8443"
-    #      - "9101:8101"
-    environment:
-      - USER_ID=998
-      - GROUP_ID=997
-      - TZ=Europe/Berlin
-      - OPENHAB_HTTP_PORT=9080
-      - OPENHAB_HTTPS_PORT=9443
-      - LANG=de_DE.UTF-8
-      - LC_ALL=de_DE.UTF-8
-      - LANGUAGE=de_DE.UTF-8
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-      - ${DATADIR}/openhab/conf:/openhab/conf
-      - ${DATADIR}/openhab/userdata:/openhab/userdata
-      - ${DATADIR}/openhab/addons:/openhab/addons
-      - ${DATADIR}/openhab/etc:/etc/openhab
+    image: "openhab/openhab:latest"
     restart: unless-stopped
-    network_mode: host
-    #networks:
-    #  - t2_proxy
+    #    network_mode: host
+    networks:
+      - t2_proxy
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "./addons:/openhab/addons"
+      - "./conf:/openhab/conf"
+      - "./userdata:/openhab/userdata"
+    ports:
+      - 9080:8080
+      - 9443:8443
+      - 8108:8108
+      - 2000:2000
+      - 2001:2001
+      - 2010:2010
+      - 8701:8701
+      - 9292:9292
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+      USER_ID: 1000
+      GROUP_ID: 1000
+      CRYPTO_POLICY: "unlimited"
+      LC_ALL: de_DE.UTF-8
+      LANG: de_DE.UTF-8
+      LANGUAGE: de_DE.UTF-8
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.openhab-rtr.entrypoints=https"
+      - "traefik.http.routers.openhab-rtr.rule=Host(`openhab.$DOMAINNAME`)"
+      - "traefik.http.routers.openhab-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.openhab-rtr.middlewares=chain-no-auth@file" # No Authentication
+#      - "traefik.http.routers.openhab-rtr.middlewares=chain-authelia@file" # No Authentication
+#      - "traefik.http.routers.openhab-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
+#      - "traefik.http.routers.openhab-rtr.middlewares=chain-oauth@file" # Google OAuth 2.0
+      ## HTTP Services
+      - "traefik.http.routers.openhab-rtr.service=openhab-svc"
+      - "traefik.http.services.openhab-svc.loadbalancer.server.port=8080"
 
-    #networks:
-    #    t2_proxy:
-    #        external: true
-
+networks:
+  t2_proxy:
+    external: true
 

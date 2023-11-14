@@ -5,7 +5,7 @@ version: '3.3'
 services:
 
   mariadbmaster:
-    image: tiredofit/mariadb:10.6
+    image: tiredofit/mariadb:10.7
     restart: always
     container_name: mariadbmaster
     networks:
@@ -44,7 +44,8 @@ services:
     links:
       - mariadbmaster
     volumes:
-      - ./backups:/backup
+      - ~/backup/homeassistant/db:/backup
+      - ./post-script.sh:/assets/custom-scripts/post-script.sh
     environment:
       - DB_TYPE=mariadb
       - DB_HOST=mariadbmaster
@@ -57,6 +58,7 @@ services:
       - MD5=TRUE
       - COMPRESSION=GZ
       - SPLIT_DB=TRUE
+      - CONTAINER_ENABLE_MONITORING=false
     networks:
       - t2_proxy
 

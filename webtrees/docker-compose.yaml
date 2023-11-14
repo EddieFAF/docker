@@ -39,7 +39,7 @@ services:
 
   webtrees-db:
     container_name: webtrees-db
-    image: mariadb:10.5
+    image: mariadb:10.7
     restart: always
     environment:
       - MYSQL_DATABASE=webtrees

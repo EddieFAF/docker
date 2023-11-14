@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  linkding:
+    container_name: "${LD_CONTAINER_NAME:-linkding}"
+    image: sissbruecker/linkding:latest
+    ports:
+      - "${LD_HOST_PORT:-9090}:9090"
+    volumes:
+      - "${LD_HOST_DATA_DIR:-./data}:/etc/linkding/data"
+    env_file:
+      - .env
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.linkding-rtr.entrypoints=https"
+      - "traefik.http.routers.linkding-rtr.rule=Host(`linkding.eisvogelweg2.de`)"
+      - "traefik.http.routers.linkding-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.linkding-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.linkding-rtr.service=linkding-svc"
+      - "traefik.http.services.linkding-svc.loadbalancer.server.port=9090"
+    networks:
+      - t2_proxy
+
+networks:
+  t2_proxy:
+    external: true
