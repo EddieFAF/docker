@@ -29,6 +29,7 @@ services:
       ## HTTP Services
       - "traefik.http.routers.ntfy-rtr.service=ntfy-svc"
       - "traefik.http.services.ntfy-svc.loadbalancer.server.port=80"
+      - "com.cneturylinklabs.watchtower.enabled=true"
 
 networks:
   t2_proxy:

@@ -28,6 +28,7 @@ services:
       - flame.name=freshrss
       - flame.url=https://freshrss.eisvogelweg2.de
       - flame.icon=freshrss.png # Optional, default is "docker"
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - t2_proxy
 

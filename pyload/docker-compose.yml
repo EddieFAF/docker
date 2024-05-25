@@ -1,5 +1,4 @@
 ---
-version: "2.1"
 services:
   pyload:
     image: ghcr.io/linuxserver/pyload-ng:latest
@@ -17,7 +16,7 @@ services:
     networks:
       - t2_proxy
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=false"
       ## HTTP Routers
       - "traefik.http.routers.pyload-rtr.entrypoints=https"
       - "traefik.http.routers.pyload-rtr.rule=Host(`pyload.eisvogelweg2.de`)"
@@ -34,6 +33,7 @@ services:
       - flame.name=pyLoad
       - flame.url=https://192.168.2.22:8089
       - flame.icon=pyload.png # Optional, default is "docker"
+      - "com.centurylinklabs.watchtower.enable=true"
     restart: unless-stopped
 
 networks:

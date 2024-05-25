@@ -40,7 +40,7 @@ services:
       - flame.name=grocy
       - flame.url=https://grocy.eisvogelweg2.de
       - flame.icon=grocy.png # Optional, default is "docker"
-
+      - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
   t2_proxy:

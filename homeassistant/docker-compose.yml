@@ -1,5 +1,5 @@
 ---
-version: "2.1"
+#version: "2.1"
 services:
   homeassistant:
     image: homeassistant/home-assistant:stable
@@ -17,6 +17,8 @@ services:
     volumes:
       - ./config:/config
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./media:/media/local
+      - /mnt/nasgard/Medien/Music:/media/synology
         #    devices:
       #      - /dev/ttyUSB0:/dev/ttyUSB0
     restart: unless-stopped

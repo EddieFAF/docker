@@ -59,6 +59,7 @@ services:
       - flame.name=Searx
       - flame.url=https://suche.eisvogelweg2.de
       - flame.icon=searxmetasearchengine.png # Optional, default is "docker"
+      - com.centurylinklabs.watchtower.enable=true
 
 
   morty:

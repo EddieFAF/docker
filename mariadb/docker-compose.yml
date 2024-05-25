@@ -35,7 +35,8 @@ services:
       - ${DATADIR}/mariadbmaster/data:/var/lib/mysql
       - ${DATADIR}/mariadbmaster/conf:/etc/mysql/mariadb.conf.d
       - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro #     - ${DATADIR}/mariadbmaster/dbbackup:/backup
+      - /etc/localtime:/etc/localtime:ro 
+        #     - ${DATADIR}/mariadbmaster/dbbackup:/backup
 
   maria-db-backup:
     container_name: maria-db-backup

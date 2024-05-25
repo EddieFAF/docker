@@ -30,7 +30,6 @@
 # For more extensive installation and update instructions, refer to the
 # documentation.
 
-version: "3.4"
 services:
   broker:
     image: redis:7.2-alpine
@@ -44,6 +43,7 @@ services:
       REDIS_ARGS: "--save 60 10"
     labels:
       - 'wud.tag.include=^\d.\+\d+$$'
+      - "com.centurylinklabs.watchtower.enable=true"
 
   paperless-db:
     image: postgres:16.0-alpine
@@ -59,10 +59,12 @@ services:
       - intern
     labels:
       - 'wud.tag.include=^\d.\+\d+$$'
+      - "com.centurylinklabs.watchtower.enable=true"
 
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: paperless-pgadmin
+    restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@eisvogelweg2.de
       PGADMIN_DEFAULT_PASSWORD: ilikec0derz!
@@ -96,7 +98,7 @@ services:
       - ${DATADIR}/paperless/data:/usr/src/paperless/data
       - /mnt/nasgard/Projekte/Paperless/media:/usr/src/paperless/media
       - /mnt/nasgard/Projekte/Paperless/export:/usr/src/paperless/export
-      - /mnt/nasgard/Import/paperless:/usr/src/paperless/consume
+      - /mnt/nasgard/Projekte/Paperless/import:/usr/src/paperless/consume
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
@@ -104,10 +106,12 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-      PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{document_type}/{created_year}{created_month}{created_day} - {title}, {tag_list}"
+      PAPERLESS_FILENAME_FORMAT: "{correspondent}/{created_year}/{created_year}-{created_month}-{created_day} {document_type} {correspondent} {title} - {tag_list}"
       PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: "True"
       PAPERLESS_ALLOWED_HOSTS: eisvogelweg2.de,paperless.eisvogelweg2.de,localhost,192.168.2.22
       PAPERLESS_CORS_ALLOWED_HOSTS: http://paperless.eisvogelweg2.de,http://localhost:8000
+      PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'
+      PAPERLESS_IGNORE_DATES: '31.12.1971,11.01.1987,23.03.2010,06.09.2018'
     networks:
       - intern
       - t2_proxy
@@ -141,6 +145,7 @@ services:
       - intern
     labels:
       - 'wud.tag.include=^\d.\+\d+$$'
+      - "com.centurylinklabs.watchtower.enable=true"
 
   tika:
     image: apache/tika

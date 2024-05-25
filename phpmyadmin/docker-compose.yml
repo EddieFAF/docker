@@ -38,12 +38,17 @@ services:
       - flame.name=phpmyadminn
       - flame.url=https://phpmyadmin.eisvogelweg2.de
       - flame.icon=phpmyadmin.png # Optional, default is "docker"
+      - "com.centurylinklabs.watchtower.enable=true"
     volumes:
-      - ./sessions:/sessions
+      - sessions:/sessions
       #  external_links:
     #   - mariadbmaster
 networks:
   t2_proxy:
     external: true
-##EOF
+
+volumes:
+  sessions:
+
+ ##EOF
 
