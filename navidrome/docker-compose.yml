@@ -20,8 +20,8 @@ services:
       - ND_DEFAULTLANGUAGE="de"
       - ND_LASTFM_ENABLED=true
       - ND_LASTFM_LANGUAGE="de"
-      - ND_LASTFM_APIKEY="3ab82fbd3b686b6234e5ccfd381c1a9c"
-      - ND_LASTFM_SECRET="0b492ebcb94959c83a68c666cd04e808"
+      - ND_LASTFM_APIKEY=$ND_LASTFM_APIKEY
+      - ND_LASTFM_SECRET=$ND_LASTFM_SECRET
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -47,8 +47,8 @@ services:
     environment:
       BNB_PORT: 4534
       # ip address of your machine running bonob
-      BNB_URL: http://192.168.2.22:4534  
-      BNB_SECRET: changeme
+      BNB_URL: http://192.168.2.22:4534
+      BNB_SECRET: "$BNB_SECRET"
       BNB_SONOS_AUTO_REGISTER: "true"
       BNB_SONOS_DEVICE_DISCOVERY: "true"
       BNB_SONOS_SERVICE_ID: 246
