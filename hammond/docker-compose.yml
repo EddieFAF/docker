@@ -1,4 +1,3 @@
-version: '2.1'
 services:
   hammond:
     image: alfhou/hammond
@@ -30,10 +29,10 @@ services:
       - flame.url=https://tanken.eisvogelweg2.de
       - flame.icon=docker # Optional, default is "docker"
     networks:
-      - t2_proxy
+      - proxy
 
 networks:
-  t2_proxy:
+  proxy:
     external: true
 
 
