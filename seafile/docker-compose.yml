@@ -1,4 +1,3 @@
-version: '2'
 
 services:
   db:
@@ -9,6 +8,9 @@ services:
 #      - 3306
     environment:
       - MYSQL_ROOT_PASSWORD=${SEAFILE_MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=seafile
+      - MYSQL_USER=seafile
+      - MYSQL_PASSWORD=seafilepass
       - MYSQL_LOG_CONSOLE=true
     volumes:
       - ${DATADIR}/seafile/db:/var/lib/mysql
@@ -16,7 +18,7 @@ services:
       - seafile-net
 
   memcached:
-    image: memcached:1.6.18
+    image: memcached:latest
     container_name: seafile-memcached
     restart: unless-stopped
     entrypoint: memcached -m 256
@@ -25,13 +27,16 @@ services:
 
   seafile:
     image: seafileltd/seafile-mc:latest
-    container_name: seafile-app
+    container_name: seafile
     restart: unless-stopped
     volumes:
       - ${DATADIR}/seafile/seafile-data:/shared
     environment:
       - DB_HOST=db
       - DB_ROOT_PASSWD=${SEAFILE_DB_ROOT_PASSWD}
+      - DB_USER=seafile
+      - DB_PASSWD=seafilepass
+      - SEAFILE_MEMCACHED_HOST=memcached
       - TIME_ZONE=${TZ}
       - SEAFILE_ADMIN_EMAIL=${SEAFILE_ADMIN_EMAIL}
       - SEAFILE_ADMIN_PASSWORD=${SEAFILE_ADMIN_PASSWORD}
@@ -43,24 +48,23 @@ services:
       - memcached
     networks:
       - seafile-net
-      - t2_proxy
+      - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=t2_proxy"
+      - "traefik.docker.network=proxy"
       - "traefik.http.routers.seafile.entrypoints=https"
       - "traefik.http.routers.seafile.rule=Host(`cloud.$DOMAINNAME`)"
-        #      - "traefik.http.routers.seafile.middlewares=chain-no-auth@file"   # calling on secured chain in config.yml
-        #      - "traefik.http.middlewares.sf-rep.redirectregex.permanent=true"
-        #      - "traefik.http.middlewares.sf-header.headers.customFrameOptionsValue=SAMEORIGIN"
-        #      - "traefik.http.routers.seafile-secure.middlewares=sf-rep,sf-header"
+      #- "traefik.http.routers.seafile.middlewares=chain-no-auth@file"   # calling on secured chain in config.yml
+      #- "traefik.http.middlewares.sf-rep.redirectregex.permanent=true"
+      #- "traefik.http.middlewares.sf-header.headers.customFrameOptionsValue=SAMEORIGIN"
+      #- "traefik.http.routers.seafile-secure.middlewares=sf-rep,sf-header"
       - "traefik.http.routers.seafile.tls=true"
       - "traefik.http.routers.seafile.service=seafile-svc"
       - "traefik.http.services.seafile-svc.loadbalancer.server.port=80"
 #      - "traefik.http.routers.seafile.service=seafile"       # Redirect to https, so no need
 
 networks:
-  t2_proxy:
-    external:
-      name: t2_proxy
+  proxy:
+    external: true
   seafile-net:
 

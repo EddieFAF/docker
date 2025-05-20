@@ -9,7 +9,7 @@ services:
       # - PASSWORD=foobar123
       - WG_PORT=51820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
-      - WG_DEFAULT_DNS=192.168.2.30
+      - WG_DEFAULT_DNS=192.168.2.35
       - LANG=de
       - UI_CHART_TYPE=1
       - UI_TRAFFIC_STATS=true

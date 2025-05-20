@@ -1,30 +1,34 @@
-version: "3.7"
 services:
 # Guacamole Daemon - Needed for Guacamole
   guacd:
-    image: guacamole/guacd:latest
+    image: guacamole/guacd:1.5.5
     container_name: guacd
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    volumes:
+      - "./fonts:/usr/local/share/fonts/"
     networks:
-      - t2_proxy
+      - proxy
+    labels:
+      - wud.watch=true
+      - 'wud.tag.include=^\d+\.\d+\.\d+$$'
 
 # Guacamole - Remote desktop, SSH, on Telnet on any HTML5 Browser
 # Create all databases and tables first
   guacamole:
-    image: guacamole/guacamole:latest
+    image: guacamole/guacamole:1.5.5
     container_name: guacamole
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - proxy
     security_opt:
       - no-new-privileges:true
 #    ports:
 #      - "$GUACAMOLE_PORT:8080"
     volumes:
       - ${DATADIR}/guacamole/home:/opt/guacamole/home
-      - "/home/eddie/.local/share/fonts/NerdFonts:/usr/local/share/fonts/Nerdfonts/"
+      #    - "/home/eddie/.local/share/fonts/NerdFonts:/usr/local/share/fonts/Nerdfonts/"
     environment:
       GUACD_HOSTNAME: guacd
       MYSQL_HOSTNAME: mariadbmaster
@@ -45,8 +49,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
       - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"
+      - wud.watch=true
+      - 'wud.tag.include=^\d+\.\d+\.\d+$$'
 
 networks:
-  t2_proxy:
+  proxy:
     external: true
 

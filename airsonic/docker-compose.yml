@@ -1,7 +1,6 @@
-version: "2"
 services:
   airsonic:
-    image: linuxserver/airsonic
+    image: lscr.io/linuxserver/airsonic-advanced:latest
     container_name: airsonic
     restart: unless-stopped
     environment:
@@ -17,7 +16,7 @@ services:
       - ${DATADIR}/airsonic/podcasts:/podcasts
       - ${DATADIR}/airsonic/other:/media #optional
     networks:
-      - t2_proxy
+      - proxy
     ports:
       - 4080:4040
     labels:
@@ -41,6 +40,6 @@ services:
       - flame.icon=airsonic.png
 
 networks:
-  t2_proxy:
+  proxy:
     external: true
 

@@ -3,7 +3,7 @@ services:
 
   filtron:
     container_name: filtron
-    image: dalf/filtron
+    image: dalf/filtron:latest
     restart: always
     ports:
       - "127.0.0.1:4040:4040"
@@ -19,6 +19,7 @@ services:
       - ALL
     labels:
       - wud.watch=true
+      - wud.watch.digest=true
 
   searx:
     container_name: searx

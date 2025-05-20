@@ -8,7 +8,7 @@ services:
     ports:
       - "4533:4533"
     networks:
-      - t2_proxy
+      - proxy
     volumes:
       - /mnt/nasgard/Medien/Music/Musik:/music/albums:ro
       - /mnt/nasgard/Medien/Music/Various:/music/sampler:ro
@@ -33,10 +33,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
-      - flame.type=application # "app" works too
-      - flame.name=navidrome
-      - flame.url=https://navidrome.eisvogelweg2.de
-      - flame.icon=search-web # Optional, default is "docker"
 
   bonob:
     image: simojenki/bonob:latest
@@ -56,9 +52,9 @@ services:
       BNB_SONOS_SEED_HOST: 192.168.2.161
       BNB_SUBSONIC_URL: http://navidrome:4533
     networks:
-      - t2_proxy
+      - proxy
 
 
 networks:
-  t2_proxy:
+  proxy:
     external: true
