@@ -12,9 +12,12 @@ services:
     volumes:
       - /mnt/nasgard/Medien/Music/Musik:/music/albums:ro
       - /mnt/nasgard/Medien/Music/Various:/music/sampler:ro
+      - /mnt/nasgard/Medien/Music/Soundtrack:/music/soundtrack:ro
+      - /mnt/nasgard/Medien/Music/Audiobook:/music2/audiobook:ro
+      - /mnt/nasgard/Medien/Music/Hoerspiele:/music3/hoerspiele:ro
       - ${DATADIR}/navidrome/data:/data
     environment:
-      - ND_SCANSCHEDULE=1h
+      - ND_SCANNER_SCHEDULE=1h
       - ND_LOGLEVEL=info
       - ND_ENABLEGRAVATAR=true
       - ND_DEFAULTLANGUAGE="de"
@@ -22,6 +25,10 @@ services:
       - ND_LASTFM_LANGUAGE="de"
       - ND_LASTFM_APIKEY=$ND_LASTFM_APIKEY
       - ND_LASTFM_SECRET=$ND_LASTFM_SECRET
+      - ND_AUTOIMPORTPLAYLISTS=false
+      - ND_IGNOREDARTICLES="The El La Los Las Le Les Os As O A Der Die Das"
+      - ND_MAXSIDEBARPLAYLISTS=10
+      - ND_PLAYLISTSPATH="./playlists"
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -34,25 +41,25 @@ services:
       - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
 
-  bonob:
-    image: simojenki/bonob:latest
-    user: 1000:1000 # should be owner of volumes
-    ports:
-      - "4534:4534"
-    restart: unless-stopped
-    environment:
-      BNB_PORT: 4534
-      # ip address of your machine running bonob
-      BNB_URL: http://192.168.2.22:4534
-      BNB_SECRET: "$BNB_SECRET"
-      BNB_SONOS_AUTO_REGISTER: "true"
-      BNB_SONOS_DEVICE_DISCOVERY: "true"
-      BNB_SONOS_SERVICE_ID: 246
-      # ip address of one of your sonos devices
-      BNB_SONOS_SEED_HOST: 192.168.2.161
-      BNB_SUBSONIC_URL: http://navidrome:4533
-    networks:
-      - proxy
+  # bonob:
+  #   image: simojenki/bonob:latest
+  #   user: 1000:1000 # should be owner of volumes
+  #   ports:
+  #     - "4534:4534"
+  #   restart: unless-stopped
+  #   environment:
+  #     BNB_PORT: 4534
+  #     # ip address of your machine running bonob
+  #     BNB_URL: http://192.168.2.22:4534
+  #     BNB_SECRET: "$BNB_SECRET"
+  #     BNB_SONOS_AUTO_REGISTER: "true"
+  #     BNB_SONOS_DEVICE_DISCOVERY: "true"
+  #     BNB_SONOS_SERVICE_ID: 246
+  #     # ip address of one of your sonos devices
+  #     BNB_SONOS_SEED_HOST: 192.168.2.161
+  #     BNB_SUBSONIC_URL: http://navidrome:4533
+  #   networks:
+  #     - proxy
 
 
 networks:

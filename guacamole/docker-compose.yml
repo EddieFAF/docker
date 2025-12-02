@@ -1,7 +1,7 @@
 services:
 # Guacamole Daemon - Needed for Guacamole
   guacd:
-    image: guacamole/guacd:1.5.5
+    image: guacamole/guacd:1.6.0
     container_name: guacd
     restart: unless-stopped
     security_opt:
@@ -17,7 +17,7 @@ services:
 # Guacamole - Remote desktop, SSH, on Telnet on any HTML5 Browser
 # Create all databases and tables first
   guacamole:
-    image: guacamole/guacamole:1.5.5
+    image: guacamole/guacamole:1.6.0
     container_name: guacamole
     restart: unless-stopped
     networks:

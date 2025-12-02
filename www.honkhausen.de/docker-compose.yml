@@ -1,9 +1,8 @@
-version: "3.3"
 services:
 
 # NGINX as Webserver for www.honkhausen.de
   www-site2:
-    container_name: www.honkhausen.de
+    container_name: www_honkhausen_de
     restart: unless-stopped
     image: ghcr.io/linuxserver/nginx:latest
     volumes:
@@ -17,7 +16,7 @@ services:
       - TZ=${TZ}
       - DOCKER_MODS=linuxserver/mods:swag-auto-reload
     networks:
-      - t2_proxy
+      - proxy
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - "traefik.enable=true"
@@ -41,6 +40,6 @@ services:
       retries: 5
 
 networks:
-  t2_proxy:
+  proxy:
     external: true
 

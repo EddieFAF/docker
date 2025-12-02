@@ -2,14 +2,13 @@
 ### docker-compose.yml
 ###
 ##START
-version: '3'
 services:
   adminer:
     image: adminer:latest
     restart: "unless-stopped"
     container_name: adminer
     networks:
-      - t2_proxy
+      - proxy
       #  ports:
       #   - 80
     environment:
@@ -38,7 +37,7 @@ services:
     external_links:
       - mariadbmaster
 networks:
-  t2_proxy:
+  proxy:
     external: true
 ##EOF
 
